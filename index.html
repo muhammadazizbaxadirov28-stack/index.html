@@ -1,0 +1,2099 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Adraschi Amaki — Milliy Matolar va Kiyimlar</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #FAF6F0;
+      --bg-card: #FFFDF9;
+      --bg-soft: #F3ECE0;
+      --text-main: #2A1F18;
+      --text-muted: #6E5C4F;
+      --accent-amber: #B45309;
+      --accent-amber-dark: #92400E;
+      --accent-red: #DC2626;
+      --border-warm: #E5D8C5;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-cream);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    input, textarea, select {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+
+    .font-display {
+      font-family: 'Playfair Display', Georgia, serif;
+    }
+
+    .ikat-pattern {
+      background-color: var(--bg-soft);
+      background-image:
+        radial-gradient(circle at 12px 12px, rgba(180, 83, 9, 0.08) 2px, transparent 0),
+        radial-gradient(circle at 36px 36px, rgba(217, 119, 6, 0.08) 2px, transparent 0);
+      background-size: 48px 48px;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-24">
+  <div id="app" class="max-w-md mx-auto min-h-screen bg-[#FAF6F0] relative shadow-sm">
+    <!-- Top Header -->
+    <header class="sticky top-0 z-30 bg-[#FFFDF9]/95 backdrop-blur border-b border-[#E5D8C5] px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-9 h-9 rounded-xl bg-amber-700 text-[#FFFDF9] flex items-center justify-center font-display font-bold text-base shrink-0 shadow-xs">
+          AA
+        </div>
+        <div class="min-w-0">
+          <div class="font-display font-bold text-base leading-tight text-[#2A1F18] truncate" id="brandTitle">
+            Adraschi Amaki
+          </div>
+          <div class="text-[11px] text-[#6E5C4F] truncate" id="brandSubtitle">
+            Milliy matolar va kiyimlar
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5 shrink-0">
+        <select id="langSelect" aria-label="Tilni tanlash" class="bg-[#F3ECE0] border border-[#E5D8C5] text-[#2A1F18] text-xs font-semibold rounded-lg px-2 py-1.5 outline-none">
+          <option value="uz">UZ</option>
+          <option value="kir">ЎЗБ</option>
+          <option value="ru">RU</option>
+          <option value="en">EN</option>
+        </select>
+
+        <button id="openAdminBtn" type="button" class="bg-[#F3ECE0] hover:bg-[#E7DCC9] border border-[#E5D8C5] text-[#2A1F18] text-xs font-semibold rounded-lg px-2.5 py-1.5 transition">
+          Admin
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="mainContent" class="px-4 pt-4 space-y-5"></main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 z-30 bg-[#FFFDF9] border-t border-[#E5D8C5]">
+      <div class="max-w-md mx-auto grid grid-cols-4 py-1.5 px-1">
+        <button data-tab="catalog" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-xs font-semibold transition" type="button">
+          <span class="text-base leading-none mb-1">🧵</span>
+          <span class="nav-label">Katalog</span>
+        </button>
+
+        <button data-tab="news" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-xs font-semibold transition relative" type="button">
+          <span class="text-base leading-none mb-1">📰</span>
+          <span class="nav-label">Yangiliklar</span>
+          <span id="newsBadgeDot" class="hidden absolute top-1 right-6 w-2 h-2 rounded-full bg-red-600"></span>
+        </button>
+
+        <button data-tab="cart" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-xs font-semibold transition relative" type="button">
+          <span class="text-base leading-none mb-1">🛍️</span>
+          <span class="nav-label">Savatcha</span>
+          <span id="cartCountBadge" class="hidden absolute top-0.5 right-4 min-w-[18px] h-[18px] px-1 rounded-full bg-amber-700 text-white text-[10px] font-bold flex items-center justify-center">0</span>
+        </button>
+
+        <button data-tab="about" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-xs font-semibold transition" type="button">
+          <span class="text-base leading-none mb-1">🏪</span>
+          <span class="nav-label">Biz haqimizda</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Onboarding Modal -->
+    <div id="onboardingModal" class="hidden fixed inset-0 z-50 bg-[#2A1F18]/50 backdrop-blur-[1px] flex items-end sm:items-center justify-center p-4">
+      <div class="w-full max-w-md bg-[#FFFDF9] border border-[#E5D8C5] rounded-2xl p-5 shadow-xl space-y-4">
+        <div class="text-center space-y-1">
+          <div class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-amber-100 text-amber-800 text-xl mb-1">✨</div>
+          <h2 id="onboardTitle" class="font-display text-xl font-bold text-[#2A1F18]">Xush Kelibsiz!</h2>
+          <p id="onboardDesc" class="text-xs text-[#6E5C4F]">Adraschi Amaki milliy matolar va kiyimlar do'koni yo'riqnomasi</p>
+        </div>
+
+        <div class="space-y-2.5 text-xs">
+          <div class="p-3 rounded-xl bg-[#FAF6F0] border border-[#E5D8C5]">
+            <div id="step1Title" class="font-bold text-[#2A1F18] mb-0.5">1. Metr / Donasini Tanlang</div>
+            <div id="step1Desc" class="text-[#6E5C4F]">Matolar metrda, kiyimlar esa donalab sotiladi. O'zingizga kerakli miqdorni belgilang.</div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-[#FFFDF9] border border-[#E5D8C5]">
+            <div id="step2Title" class="font-bold text-[#2A1F18] mb-0.5">2. Savatchaga Qo'shing</div>
+            <div id="step2Desc" class="text-[#6E5C4F]">Tanlagan mahsulotlaringiz savatcha bo'limiga yig'ilib boradi.</div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200">
+            <div id="step3Title" class="font-bold text-[#2A1F18] mb-0.5">3. Sotuvchiga Yuboring</div>
+            <div id="step3Desc" class="text-[#6E5C4F]">Bitta tugmani bosish orqali buyurtmangiz tayyor holda sotuvchining Telegram chatiga boradi!</div>
+          </div>
+        </div>
+
+        <button id="closeOnboardingBtn" type="button" class="w-full py-3 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-semibold text-sm transition">
+          Boshlash
+        </button>
+      </div>
+    </div>
+
+    <!-- Exclusive Category Access Modal -->
+    <div id="exclusiveModal" class="hidden fixed inset-0 z-50 bg-[#2A1F18]/60 backdrop-blur-[2px] flex items-center justify-center p-4">
+      <div class="w-full max-w-sm bg-[#FFFDF9] border border-[#E5D8C5] rounded-2xl p-5 shadow-2xl space-y-4 text-center">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-100 text-amber-900 text-2xl">🔒</div>
+        <div>
+          <h3 class="font-display font-bold text-lg text-[#2A1F18]" id="exclusiveCatTitle">Eksklyuziv Bo'lim</h3>
+          <p class="text-xs text-[#6E5C4F] mt-1">Ushbu bo'limga kirish uchun admin taqdim etgan maxsus kodni kiriting.</p>
+        </div>
+
+        <input id="exclusivePassInput" type="password" placeholder="Maxfiy kodni kiriting..." class="w-full bg-[#FAF6F0] border border-[#E5D8C5] rounded-xl px-4 py-2.5 text-center text-sm font-bold text-[#2A1F18] outline-none focus:border-amber-700" />
+        <div id="exclusiveErr" class="hidden text-xs font-semibold text-red-600">Kod noto'g'ri!</div>
+
+        <div class="flex gap-2">
+          <button id="closeExclusiveModalBtn" type="button" class="w-1/2 py-2.5 rounded-xl bg-[#F3ECE0] text-[#2A1F18] text-xs font-bold">Bekor qilish</button>
+          <button id="submitExclusivePassBtn" type="button" class="w-1/2 py-2.5 rounded-xl bg-amber-700 text-white text-xs font-bold">Kirish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin PIN / Panel Modal -->
+    <div id="adminModal" class="hidden fixed inset-0 z-50 bg-[#2A1F18]/55 backdrop-blur-[1px] flex items-center justify-center p-3 overflow-y-auto">
+      <div id="adminModalCard" class="w-full max-w-md bg-[#FFFDF9] border border-[#E5D8C5] rounded-2xl p-4 shadow-xl my-auto max-h-[90vh] overflow-y-auto space-y-4"></div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastBox" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-xl bg-[#2A1F18] text-[#FFFDF9] text-xs font-semibold shadow-lg"></div>
+  </div>
+
+  <script>
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      try {
+        tg.setHeaderColor('#FFFDF9');
+        tg.setBackgroundColor('#FAF6F0');
+      } catch (e) {}
+    }
+
+    document.addEventListener('contextmenu', (e) => {
+      if (!e.target.closest('input, textarea, select')) {
+        e.preventDefault();
+      }
+    });
+    document.addEventListener('copy', (e) => {
+      if (!e.target.closest('input, textarea')) {
+        e.preventDefault();
+      }
+    });
+
+    const STORAGE_KEYS = {
+      state: 'adraschi_amaki_state_v13',
+      onboarded: 'adraschi_amaki_onboarded_v13',
+      analytics: 'adraschi_amaki_analytics_v13'
+    };
+
+    const LEGACY_STATE_KEYS = [
+      'adraschi_amaki_state_v12',
+      'adraschi_amaki_state_v11',
+      'adraschi_amaki_state_v10',
+      'adraschi_amaki_state_v9',
+      'adraschi_amaki_state_v8',
+      'adraschi_amaki_state_v7',
+      'adraschi_amaki_state_v6',
+      'adraschi_amaki_state_v5',
+      'adraschi_amaki_state_v4',
+      'adraschi_amaki_state_v3',
+      'adraschi_amaki_state_v2',
+      'adraschi_amaki_state_v1',
+      'adraschi_amaki_state'
+    ];
+
+    const LEGACY_ANALYTICS_KEYS = [
+      'adraschi_amaki_analytics_v12',
+      'adraschi_amaki_analytics_v11',
+      'adraschi_amaki_analytics_v10',
+      'adraschi_amaki_analytics_v9',
+      'adraschi_amaki_analytics_v8',
+      'adraschi_amaki_analytics_v7',
+      'adraschi_amaki_analytics_v6',
+      'adraschi_amaki_analytics'
+    ];
+
+    const SUBCATEGORY_TRANSLATIONS = {
+      'sub-adras': { uz: 'Adras', kir: 'Адрас', ru: 'Адрас', en: 'Adras' },
+      'sub-atlas': { uz: 'Atlas', kir: 'Атлас', ru: 'Атлас', en: 'Atlas' },
+      'sub-beqasam': { uz: 'Beqasam', kir: 'Беқасам', ru: 'Бекасам', en: 'Bekasam' },
+      'sub-chopon': { uz: 'Choponlar', kir: 'Чопонлар', ru: 'Чапаны', en: 'Chapans' },
+      'sub-doppi': { uz: "Do'ppilar", kir: 'Дўппилар', ru: 'Тюбетейки', en: 'Doppis' },
+      'sub-sets': { uz: "Sovg'a to'plamlari", kir: 'Совға тўпламлари', ru: 'Подарочные наборы', en: 'Gift Sets' }
+    };
+
+    const CATEGORY_TRANSLATIONS = {
+      'cat-[#EXCL]': { uz: 'Eksklyuziv', kir: 'Эксклюзив', ru: 'Эксклюзив', en: 'Exclusive' },
+      'cat-fabrics': { uz: 'Matolar', kir: 'Матолар', ru: 'Ткани', en: 'Fabrics' },
+      'cat-clothing': { uz: 'Milliy kiyimlar', kir: 'Миллий кийимлар', ru: 'Национальная одежда', en: 'National Clothing' },
+      'cat-souvenirs': { uz: "Eslatma va sovg'alar", kir: 'Эслатма ва совғалар', ru: 'Сувениры и подарки', en: 'Souvenirs & Gifts' }
+    };
+
+    const PRODUCT_TRANSLATIONS = {
+      'prod-1': {
+        name: { uz: 'Zumrad Oltin Adras', kir: 'Зумрад Олтин Адрас', ru: 'Изумрудно-золотой адрас', en: 'Emerald Gold Adras' },
+        colorName: { uz: 'Zumrad va Oltin', kir: 'Зумрад ва Олтин', ru: 'Изумруд и золото', en: 'Emerald & Gold' },
+        description: { uz: "Qo'lda to'qilgan tabiiy paxta va ipak aralash adras matosi.", kir: 'Қўлда тўқилган табиий пахта ва ипак аралаш адрас матоси.', ru: 'Натуральная ткань адрас ручного ткачества из хлопка и шёлка.', en: 'Handwoven natural cotton and silk blend adras fabric.' }
+      }
+    };
+
+    const NEWS_TRANSLATIONS = {};
+    const COMPANY_TRANSLATIONS = {};
+
+    const initialCategories = [
+      { id: 'cat-fabrics', name: 'Matolar', icon: '🧵', isExclusive: false, passcode: '' },
+      { id: 'cat-clothing', name: 'Milliy kiyimlar', icon: '👘', isExclusive: false, passcode: '' },
+      { id: 'cat-[#EXCL]', name: 'Eksklyuziv', icon: '🔒', isExclusive: true, passcode: '777' },
+      { id: 'cat-souvenirs', name: "Eslatma va sovg'alar", icon: '🎁', isExclusive: false, passcode: '' }
+    ];
+
+    const initialSubcategories = [
+      { id: 'sub-adras', categoryId: 'cat-fabrics', name: 'Adras' },
+      { id: 'sub-atlas', categoryId: 'cat-fabrics', name: 'Atlas' },
+      { id: 'sub-beqasam', categoryId: 'cat-fabrics', name: 'Beqasam' },
+      { id: 'sub-chopon', categoryId: 'cat-clothing', name: 'Choponlar' },
+      { id: 'sub-doppi', categoryId: 'cat-clothing', name: "Do'ppilar" },
+      { id: 'sub-sets', categoryId: 'cat-souvenirs', name: "Sovg'a to'plamlari" }
+    ];
+
+    const initialProducts = [
+      {
+        id: 'prod-1',
+        categoryId: 'cat-fabrics',
+        subcategoryId: 'sub-adras',
+        name: 'Zumrad Oltin Adras',
+        price: 85000,
+        salePrice: 72000,
+        unit: 'meter',
+        step: 0.5,
+        colorName: 'Zumrad va Oltin',
+        colorHex: '#059669',
+        description: "Qo'lda to'qilgan tabiiy paxta va ipak aralash adras matosi. Ko'ylak va kostyum uchun a'lo tanlov.",
+        images: [],
+        active: true
+      },
+      {
+        id: 'prod-excl-1',
+        categoryId: 'cat-[#EXCL]',
+        subcategoryId: '',
+        name: 'VIP Shoyi Xon-Atlas',
+        price: 450000,
+        salePrice: null,
+        unit: 'meter',
+        step: 1,
+        colorName: 'Zarrin Oltin',
+        colorHex: '#D97706',
+        description: "Maxsus eksklyuziv to'plam. Cheklangan miqdordagi ipak xon-atlas.",
+        images: [],
+        active: true
+      }
+    ];
+
+    const initialNews = [
+      {
+        id: 'news-1',
+        type: 'new_material',
+        badge: 'Yangi material',
+        title: 'Yangi Zumrad va Tillarang Adras partiyasi keldi!',
+        text: "Marg'ilondan yangi to'qilgan adras va atlas matolarimiz yetib keldi.",
+        colorName: 'Zumrad yashil / Tillarang',
+        colorHex: '#059669',
+        date: '2026-11-20'
+      }
+    ];
+
+    const defaultState = {
+      lang: 'uz',
+      activeTab: 'catalog',
+      selectedCategoryId: 'all',
+      selectedSubcategoryId: 'all',
+      unlockedExclusiveCategories: [],
+      categories: initialCategories,
+      subcategories: initialSubcategories,
+      products: initialProducts,
+      news: initialNews,
+      cart: [],
+      auth: {
+        masterCode: 'adraschi',
+        numericPin: '1234'
+      },
+      company: {
+        name: 'Adraschi Amaki',
+        tagline: "An'anaviy o'zbek matolari, adras, atlas va milliy liboslar ustaxonasi",
+        phone: '97-788-88-84',
+        telegram: '@adraschi',
+        address: 'Toshkent shahar, Chorsu bozori',
+        deliveryInfo: "Toshkent shahri ichida va butun O'zbekiston bo'ylab tezkor dostavka xizmati mavjud."
+      }
+    };
+
+    const i18n = {
+      uz: {
+        brandSub: 'Milliy matolar va kiyimlar',
+        catalog: 'Katalog',
+        news: 'Yangiliklar',
+        cart: 'Savatcha',
+        about: 'Biz haqimizda',
+        all: 'Barchasi',
+        meterUnit: 'metr',
+        pieceUnit: 'dona',
+        addToCart: "Savatchaga qo'shish",
+        addedToast: "Savatchaga qo'shildi",
+        emptyCart: "Savatchangiz hozircha bo'sh",
+        emptyCartDesc: 'Katalogdan mato yoki kiyim tanlab, miqdorini belgilang.',
+        goCatalog: "Katalogga o'tish",
+        totalSum: 'Jami summa',
+        sendOrder: 'Sotuvchiga buyurtma yuborish',
+        clearCart: 'Savatchani tozalash',
+        phoneLabel: 'Telefon raqami',
+        telegramLabel: 'Telegram lichka',
+        addressLabel: 'Manzil',
+        deliveryLabel: 'Yetkazib berish (Dostavka)',
+        helpGuide: "Yo'riqnomani ko'rish",
+        noProducts: "Bu bo'limda hozircha mahsulot topilmadi.",
+        colorLabel: 'Rangi',
+        sendSectionImg: "Bo'lim rasmini yuborish",
+        sendItemImg: 'Rasmni yuborish',
+        imgSentToast: 'Rasm yuborishga tayyorlandi',
+        addImagesLabel: "Mahsulot rasmlari (xohlagancha tanlang)",
+        imagesSelectedCount: 'ta rasm tanlandi',
+        currencySuffix: "so'm",
+        archiveBtn: 'Arxivlash',
+        unarchiveBtn: 'Tiklash',
+        archivedBadge: 'Arxivda',
+        activeProductsTitle: 'Faol mahsulotlar',
+        archivedProductsTitle: 'Arxivlangan mahsulotlar',
+        callBtn: "Qo'ng'iroq",
+        writeBtn: 'Yozish',
+        announcementsSuffix: "ta e'lon",
+        noNews: "Hozircha yangiliklar yo'q.",
+        onboardTitle: 'Xush Kelibsiz!',
+        onboardDesc: "Adraschi Amaki milliy matolar va kiyimlar do'koni yo'riqnomasi",
+        step1Title: '1. Metr / Donasini Tanlang',
+        step1Desc: "Matolar metrda, kiyimlar esa donalab sotiladi.",
+        step2Title: "2. Savatchaga Qo'shing",
+        step2Desc: "Tanlagan mahsulotlaringiz savatcha bo'limiga yig'ilib boradi.",
+        step3Title: '3. Sotuvchiga Yuboring',
+        step3Desc: 'Bitta tugmani bosish orqali buyurtmangiz tayyor holda Telegram chatga boradi!',
+        startBtn: 'Boshlash',
+        adminBtn: 'Admin',
+        adminTitle: 'Admin Panel',
+        adminLoginTitle: 'Admin Kirish (2 bosqichli)',
+        step1CodeLabel: '1-bosqich: Harfli kod',
+        step1CodePlaceholder: 'Harfli kodni kiriting',
+        nextStepBtn: 'Keyingi bosqich',
+        step2PinLabel: '2-bosqich: Oddiy raqamli kod',
+        step2PinPlaceholder: 'Raqamli kodni kiriting',
+        backStepBtn: 'Orqaga',
+        adminCodeError: "Kod noto'g'ri! Qayta kiriting.",
+        loginBtn: 'Kirish',
+        lockBtn: 'Qulflash',
+        visitsLabel: 'Kirishlar',
+        ordersLabel: 'Buyurtma',
+        conversionLabel: 'Konversiya',
+        admTabProducts: 'Mahsulot',
+        admTabCategories: "Bo'limlar",
+        admTabNews: 'Yangilik',
+        admTabCodes: "Kod o'zgartirish",
+        admTabCompany: "Ma'lumot",
+        addProdTitle: "Yangi mahsulot qo'shish",
+        editProdTitle: 'Mahsulotni tahrirlash',
+        editBtn: 'Tahrirlash',
+        cancelEditBtn: 'Bekor qilish',
+        prodNamePlaceholder: 'Nomi (masalan: Bahor Adras)',
+        prodPricePlaceholder: "Asosiy narx (so'm)",
+        prodSalePlaceholder: 'Aksiya narx (ixtiyoriy)',
+        prodColorPlaceholder: 'Rangi (masalan: Zumrad)',
+        unitMeter: 'Metrda',
+        unitPiece: 'Donalab',
+        addBtn: "Qo'shish",
+        deleteBtn: "O'chirish",
+        saveBtn: 'Saqlash',
+        savedToast: 'Saqlandi',
+        addNewsTitle: "Yangi e'lon qo'shish",
+        editNewsTitle: "E'lonni tahrirlash",
+        newsTitlePlaceholder: 'Sarlavha',
+        newsTextPlaceholder: 'Matn...',
+        publishBtn: 'Joylashtirish',
+        mainCategoriesTitle: "Asosiy (katta) bo'limlar",
+        editCategoryTitle: "Bo'limni o'zgartirish",
+        addCategoryPlaceholder: "Yangi bo'lim nomi",
+        subCategoriesTitle: "Kichik bo'limlar (katta bo'lim ichida)",
+        addSubCategoryPlaceholder: "Yangi kichik bo'lim nomi",
+        editSubCategoryTitle: "Kichik bo'limni tahrirlash",
+        noSubSelect: "Kichik bo'limsiz",
+        authSettingsTitle: "Kod o'zgartirish bo'limi",
+        newMasterCodeLabel: '1-bosqich: Harfli kod',
+        newNumericPinLabel: '2-bosqich: Oddiy raqamli kod',
+        newPinPlaceholder: 'Faqat raqamlar (masalan: 5678)'
+      },
+      kir: { brandSub: 'Миллий матолар ва кийимлар', catalog: 'Каталог', news: 'Янгиликлар', cart: 'Саватча', about: 'Биз ҳақимизда', all: 'Барчаси', meterUnit: 'метр', pieceUnit: 'дона', addToCart: 'Саватчага қўшиш', addedToast: 'Саватчага қўшилди', emptyCart: 'Саватчангиз ҳозирча бўш', emptyCartDesc: 'Каталогдан танланг.', goCatalog: 'Каталогга ўтиш', totalSum: 'Жами сумма', sendOrder: 'Сотувчига юбориш', clearCart: 'Тозалаш', phoneLabel: 'Тел', telegramLabel: 'Телеграм', addressLabel: 'Манзил', deliveryLabel: 'Доставка', helpGuide: 'Йўриқнома', noProducts: 'Маҳсулот топилмади.', colorLabel: 'Ранги', sendSectionImg: 'Бўлим расми', sendItemImg: 'Расмни юбориш', imgSentToast: 'Тайёрланди', addImagesLabel: 'Расмлар', imagesSelectedCount: 'та танланди', currencySuffix: 'сўм', archiveBtn: 'Архивлаш', unarchiveBtn: 'Тиклаш', archivedBadge: 'Архивда', activeProductsTitle: 'Фаол', archivedProductsTitle: 'Архив', callBtn: 'Қўнғироқ', writeBtn: 'Ёзиш', announcementsSuffix: 'та', noNews: 'Йўқ', onboardTitle: 'Хуш Келибсиз!', onboardDesc: 'Йўриқнома', step1Title: '1. Танланг', step1Desc: 'Метр/Дона', step2Title: '2. Саватча', step2Desc: 'Йиғилади', step3Title: '3. Юборинг', step3Desc: 'Telegram', startBtn: 'Бошлаш', adminBtn: 'Админ', adminTitle: 'Админ Панел', adminLoginTitle: 'Кириш', step1CodeLabel: '1-босқич', step1CodePlaceholder: 'Код', nextStepBtn: 'Кейинги', step2PinLabel: '2-босқич', step2PinPlaceholder: 'PIN', backStepBtn: 'Орқага', adminCodeError: 'Хато!', loginBtn: 'Кириш', lockBtn: 'Қулфлаш', visitsLabel: 'Киришлар', ordersLabel: 'Буюртма', conversionLabel: 'Конверсия', admTabProducts: 'Маҳсулот', admTabCategories: 'Бўлимлар', admTabNews: 'Янгилик', admTabCodes: 'Кодлар', admTabCompany: 'Маълумот', addProdTitle: 'Қўшиш', editProdTitle: 'Таҳрирлаш', editBtn: 'Таҳрирлаш', cancelEditBtn: 'Бекор', prodNamePlaceholder: 'Номи', prodPricePlaceholder: 'Нархи', prodSalePlaceholder: 'Акция', prodColorPlaceholder: 'Ранги', unitMeter: 'Метрда', unitPiece: 'Доналаб', addBtn: 'Қўшиш', deleteBtn: 'Ўчириш', saveBtn: 'Сақлаш', savedToast: 'Сақланди', addNewsTitle: 'Эълон', editNewsTitle: 'Таҳрирлаш', newsTitlePlaceholder: 'Сарлавҳа', newsTextPlaceholder: 'Матн', publishBtn: 'Жойлаш', mainCategoriesTitle: 'Бўлимлар', editCategoryTitle: 'Ўзгартириш', addCategoryPlaceholder: 'Номи', subCategoriesTitle: 'Кичик бўлимлар', addSubCategoryPlaceholder: 'Номи', editSubCategoryTitle: 'Таҳрирлаш', noSubSelect: 'Йўқ', authSettingsTitle: 'Кодлар', newMasterCodeLabel: '1-босқич', newNumericPinLabel: '2-босқич', newPinPlaceholder: '5678' },
+      ru: { brandSub: 'Национальные ткани и одежда', catalog: 'Каталог', news: 'Новости', cart: 'Корзина', about: 'О нас', all: 'Все', meterUnit: 'метр', pieceUnit: 'шт.', addToCart: 'В корзину', addedToast: 'Добавлено', emptyCart: 'Корзина пуста', emptyCartDesc: 'Выберите товар.', goCatalog: 'В каталог', totalSum: 'Итого', sendOrder: 'Отправить заказ', clearCart: 'Очистить', phoneLabel: 'Телефон', telegramLabel: 'Telegram', addressLabel: 'Адрес', deliveryLabel: 'Доставка', helpGuide: 'Инструкция', noProducts: 'Нет товаров.', colorLabel: 'Цвет', sendSectionImg: 'Фото раздела', sendItemImg: 'Отправить фото', imgSentToast: 'Готово', addImagesLabel: 'Фотографии', imagesSelectedCount: 'выбрано', currencySuffix: 'сум', archiveBtn: 'В архив', unarchiveBtn: 'Восстановить', archivedBadge: 'В архиве', activeProductsTitle: 'Активные', archivedProductsTitle: 'В архиве', callBtn: 'Позвонить', writeBtn: 'Написать', announcementsSuffix: 'объявл.', noNews: 'Нет новостей.', onboardTitle: 'Приветствуем!', onboardDesc: 'Инструкция', step1Title: '1. Количество', step1Desc: 'Метры или штуки', step2Title: '2. В корзину', step2Desc: 'Собирается в корзине', step3Title: '3. Отправка', step3Desc: 'В Telegram', startBtn: 'Начать', adminBtn: 'Админ', adminTitle: 'Админ-панель', adminLoginTitle: 'Вход', step1CodeLabel: '1-й этап', step1CodePlaceholder: 'Код', nextStepBtn: 'Далее', step2PinLabel: '2-й этап', step2PinPlaceholder: 'ПИН', backStepBtn: 'Назад', adminCodeError: 'Неверно!', loginBtn: 'Войти', lockBtn: 'Заблокировать', visitsLabel: 'Визиты', ordersLabel: 'Заказы', conversionLabel: 'Конверсия', admTabProducts: 'Товары', admTabCategories: 'Разделы', admTabNews: 'Новости', admTabCodes: 'Коды', admTabCompany: 'Инфо', addProdTitle: 'Добавить', editProdTitle: 'Изменить', editBtn: 'Изменить', cancelEditBtn: 'Отмена', prodNamePlaceholder: 'Название', prodPricePlaceholder: 'Цена', prodSalePlaceholder: 'Скидка', prodColorPlaceholder: 'Цвет', unitMeter: 'В метрах', unitPiece: 'Поштучно', addBtn: 'Добавить', deleteBtn: 'Удалить', saveBtn: 'Сохранить', savedToast: 'Сохранено', addNewsTitle: 'Объявление', editNewsTitle: 'Изменить', newsTitlePlaceholder: 'Заголовок', newsTextPlaceholder: 'Текст', publishBtn: 'Опубликовать', mainCategoriesTitle: 'Разделы', editCategoryTitle: 'Изменить', addCategoryPlaceholder: 'Название', subCategoriesTitle: 'Подразделы', addSubCategoryPlaceholder: 'Название', editSubCategoryTitle: 'Изменить', noSubSelect: 'Без подраздела', authSettingsTitle: 'Смена кодов', newMasterCodeLabel: '1-й этап', newNumericPinLabel: '2-й этап', newPinPlaceholder: '5678' },
+      en: { brandSub: 'National fabrics & apparel', catalog: 'Catalog', news: 'News', cart: 'Cart', about: 'About', all: 'All', meterUnit: 'meter', pieceUnit: 'pcs', addToCart: 'Add to cart', addedToast: 'Added', emptyCart: 'Cart is empty', emptyCartDesc: 'Choose products.', goCatalog: 'Browse catalog', totalSum: 'Total', sendOrder: 'Send order', clearCart: 'Clear', phoneLabel: 'Phone', telegramLabel: 'Telegram', addressLabel: 'Address', deliveryLabel: 'Delivery', helpGuide: 'Guide', noProducts: 'No items.', colorLabel: 'Color', sendSectionImg: 'Section image', sendItemImg: 'Send image', imgSentToast: 'Ready', addImagesLabel: 'Images', imagesSelectedCount: 'selected', currencySuffix: 'UZS', archiveBtn: 'Archive', unarchiveBtn: 'Restore', archivedBadge: 'Archived', activeProductsTitle: 'Active', archivedProductsTitle: 'Archived', callBtn: 'Call', writeBtn: 'Message', announcementsSuffix: 'posts', noNews: 'No news.', onboardTitle: 'Welcome!', onboardDesc: 'Guide', step1Title: '1. Select', step1Desc: 'Meters / pieces', step2Title: '2. Add', step2Desc: 'Cart', step3Title: '3. Send', step3Desc: 'Telegram', startBtn: 'Start', adminBtn: 'Admin', adminTitle: 'Admin Panel', adminLoginTitle: 'Login', step1CodeLabel: 'Step 1', step1CodePlaceholder: 'Code', nextStepBtn: 'Next', step2PinLabel: 'Step 2', step2PinPlaceholder: 'PIN', backStepBtn: 'Back', adminCodeError: 'Invalid!', loginBtn: 'Login', lockBtn: 'Lock', visitsLabel: 'Visits', ordersLabel: 'Orders', conversionLabel: 'Conversion', admTabProducts: 'Products', admTabCategories: 'Categories', admTabNews: 'News', admTabCodes: 'Codes', admTabCompany: 'Info', addProdTitle: 'Add', editProdTitle: 'Edit', editBtn: 'Edit', cancelEditBtn: 'Cancel', prodNamePlaceholder: 'Name', prodPricePlaceholder: 'Price', prodSalePlaceholder: 'Sale', prodColorPlaceholder: 'Color', unitMeter: 'Meter', unitPiece: 'Piece', addBtn: 'Add', deleteBtn: 'Delete', saveBtn: 'Save', savedToast: 'Saved', addNewsTitle: 'News', editNewsTitle: 'Edit', newsTitlePlaceholder: 'Title', newsTextPlaceholder: 'Text', publishBtn: 'Publish', mainCategoriesTitle: 'Categories', editCategoryTitle: 'Edit', addCategoryPlaceholder: 'Name', subCategoriesTitle: 'Subcategories', addSubCategoryPlaceholder: 'Name', editSubCategoryTitle: 'Edit', noSubSelect: 'None', authSettingsTitle: 'Change codes', newMasterCodeLabel: 'Step 1', newNumericPinLabel: 'Step 2', newPinPlaceholder: '5678' }
+    };
+
+    function getLocalizedCategoryName(cat, lang = state.lang) {
+      if (!cat) return '';
+      if (CATEGORY_TRANSLATIONS[cat.id] && CATEGORY_TRANSLATIONS[cat.id][lang]) {
+        return CATEGORY_TRANSLATIONS[cat.id][lang];
+      }
+      return cat.name;
+    }
+
+    function getLocalizedSubcategoryName(sub, lang = state.lang) {
+      if (!sub) return '';
+      if (SUBCATEGORY_TRANSLATIONS[sub.id] && SUBCATEGORY_TRANSLATIONS[sub.id][lang]) {
+        return SUBCATEGORY_TRANSLATIONS[sub.id][lang];
+      }
+      return sub.name;
+    }
+
+    function getLocalizedProductField(prod, field, lang = state.lang) {
+      if (!prod) return '';
+      const tr = PRODUCT_TRANSLATIONS[prod.id];
+      if (tr && tr[field] && tr[field][lang]) {
+        return tr[field][lang];
+      }
+      return prod[field] || '';
+    }
+
+    function getLocalizedNewsField(item, field, lang = state.lang) {
+      if (!item) return '';
+      const tr = NEWS_TRANSLATIONS[item.id];
+      if (tr && tr[field] && tr[field][lang]) {
+        return tr[field][lang];
+      }
+      return item[field] || '';
+    }
+
+    function getLocalizedCompanyField(field, lang = state.lang) {
+      const c = state.company || {};
+      if (field === 'name') return c.name || 'Adraschi Amaki';
+      if (field === 'phone') return c.phone || '97-788-88-84';
+      if (field === 'telegram') return c.telegram || '@adraschi';
+      return c[field] || '';
+    }
+
+    function findSavedStateRaw() {
+      const candidates = [STORAGE_KEYS.state, ...LEGACY_STATE_KEYS];
+      for (const key of candidates) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (raw) return raw;
+        } catch (e) {}
+      }
+      return null;
+    }
+
+    function loadState() {
+      try {
+        const raw = findSavedStateRaw();
+        if (!raw) return structuredClone(defaultState);
+        const parsed = JSON.parse(raw);
+
+        const loadedCats = Array.isArray(parsed.categories) && parsed.categories.length
+          ? parsed.categories.map(c => ({
+              ...c,
+              isExclusive: !!c.isExclusive,
+              passcode: c.passcode || (c.id === 'cat-[#EXCL]' ? '777' : '')
+            }))
+          : structuredClone(initialCategories);
+
+        const loadedSubs = Array.isArray(parsed.subcategories)
+          ? parsed.subcategories
+          : structuredClone(initialSubcategories);
+
+        const mergedState = {
+          ...structuredClone(defaultState),
+          ...parsed,
+          categories: loadedCats,
+          subcategories: loadedSubs,
+          products: Array.isArray(parsed.products) && parsed.products.length
+            ? parsed.products.map((p) => ({
+                ...p,
+                subcategoryId: p.subcategoryId !== undefined ? p.subcategoryId : '',
+                images: Array.isArray(p.images) ? p.images : [],
+                active: p.active !== false
+              }))
+            : structuredClone(initialProducts),
+          news: Array.isArray(parsed.news) ? parsed.news : structuredClone(initialNews),
+          cart: Array.isArray(parsed.cart) ? parsed.cart : [],
+          unlockedExclusiveCategories: Array.isArray(parsed.unlockedExclusiveCategories) ? parsed.unlockedExclusiveCategories : [],
+          auth: { ...structuredClone(defaultState.auth), ...(parsed.auth || {}) },
+          company: { ...structuredClone(defaultState.company), ...(parsed.company || {}) }
+        };
+
+        try { localStorage.setItem(STORAGE_KEYS.state, JSON.stringify(mergedState)); } catch (e) {}
+        return mergedState;
+      } catch (e) {
+        return structuredClone(defaultState);
+      }
+    }
+
+    function loadAnalytics() {
+      const keys = [STORAGE_KEYS.analytics, ...LEGACY_ANALYTICS_KEYS];
+      for (const key of keys) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            return { visits: Number(parsed.visits) || 1, ordersSent: Number(parsed.ordersSent) || 0 };
+          }
+        } catch (e) {}
+      }
+      return { visits: 1, ordersSent: 0 };
+    }
+
+    let state = loadState();
+    let analytics = loadAnalytics();
+    analytics.visits += 1;
+    localStorage.setItem(STORAGE_KEYS.analytics, JSON.stringify(analytics));
+
+    let adminUnlocked = false;
+    let adminLoginStep = 1;
+    let adminTab = 'products';
+    let itemQuantities = {};
+    let draftProductImages = [];
+    let editingProductId = null;
+    let editingCategoryId = null;
+    let editingSubcategoryId = null;
+    let editingNewsId = null;
+    let adminSubParentCatId = state.categories[0] ? state.categories[0].id : 'cat-fabrics';
+    let adminProdFormCatId = '';
+    let categoryToUnlock = null;
+
+    let adminProdDraft = null;
+    function captureProdForm(resetSub) {
+      const g = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+      adminProdDraft = {
+        name: g('newProdName'),
+        sub: resetSub ? '' : g('newProdSub'),
+        price: g('newProdPrice'),
+        sale: g('newProdSale'),
+        unit: g('newProdUnit') || 'meter',
+        color: g('newProdColor')
+      };
+    }
+    function escapeHtml(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.state, JSON.stringify(state));
+      } catch (e) {
+        showToast("Xotira to'ldi, kamroq rasm yuklang");
+      }
+    }
+
+    function saveAnalytics() {
+      localStorage.setItem(STORAGE_KEYS.analytics, JSON.stringify(analytics));
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById('toastBox');
+      box.textContent = msg;
+      box.classList.remove('hidden');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => { box.classList.add('hidden'); }, 2000);
+    }
+
+    function formatPrice(num) {
+      return Number(num || 0).toLocaleString('ru-RU').replace(/,/g, ' ') + ' ' + i18n[state.lang].currencySuffix;
+    }
+
+    function effectivePrice(prod) {
+      if (prod.salePrice && Number(prod.salePrice) > 0 && Number(prod.salePrice) < Number(prod.price)) {
+        return Number(prod.salePrice);
+      }
+      return Number(prod.price);
+    }
+
+    function getQtyForProduct(prod) {
+      if (itemQuantities[prod.id] !== undefined) return itemQuantities[prod.id];
+      const def = prod.unit === 'meter' ? 1 : 1;
+      itemQuantities[prod.id] = def;
+      return def;
+    }
+
+    function changeQty(prodId, delta) {
+      const prod = state.products.find((p) => p.id === prodId);
+      if (!prod) return;
+      const step = prod.unit === 'meter' ? (Number(prod.step) || 0.5) : 1;
+      const minVal = step;
+      const current = getQtyForProduct(prod);
+      const next = Math.max(minVal, Math.round((current + delta) * 100) / 100);
+      itemQuantities[prodId] = next;
+      render();
+    }
+
+    function setExactQty(prodId, val) {
+      const prod = state.products.find((p) => p.id === prodId);
+      if (!prod) return;
+      const step = prod.unit === 'meter' ? (Number(prod.step) || 0.5) : 1;
+      const num = parseFloat(val);
+      if (isNaN(num) || num <= 0) {
+        itemQuantities[prodId] = step;
+      } else {
+        itemQuantities[prodId] = Math.round(num * 100) / 100;
+      }
+      render();
+    }
+
+    function addToCart(prodId) {
+      const prod = state.products.find((p) => p.id === prodId);
+      if (!prod) return;
+      const qty = getQtyForProduct(prod);
+      const pName = getLocalizedProductField(prod, 'name');
+      const pColor = getLocalizedProductField(prod, 'colorName');
+      const existing = state.cart.find((c) => c.productId === prodId);
+      if (existing) {
+        existing.qty = Math.round((existing.qty + qty) * 100) / 100;
+      } else {
+        state.cart.push({
+          productId: prod.id,
+          name: pName,
+          unit: prod.unit,
+          price: effectivePrice(prod),
+          colorName: pColor,
+          qty
+        });
+      }
+      saveState();
+      updateBadges();
+      showToast(i18n[state.lang].addedToast);
+    }
+
+    function updateCartItemQty(index, delta) {
+      const item = state.cart[index];
+      if (!item) return;
+      const step = item.unit === 'meter' ? 0.5 : 1;
+      const next = Math.round((item.qty + delta) * 100) / 100;
+      if (next <= 0) {
+        state.cart.splice(index, 1);
+      } else {
+        item.qty = next;
+      }
+      saveState();
+      render();
+    }
+
+    function clearCart() {
+      state.cart = [];
+      saveState();
+      render();
+    }
+
+    function buildShareCardDataUrl(title, subtitle, accentHex) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 800; canvas.height = 600;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#FAF6F0'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#E5D8C5'; ctx.lineWidth = 8;
+      ctx.strokeRect(24, 24, canvas.width - 48, canvas.height - 48);
+      ctx.fillStyle = accentHex || '#B45309'; ctx.fillRect(60, 70, 140, 10);
+      ctx.fillStyle = '#6E5C4F'; ctx.font = 'bold 26px Inter, sans-serif';
+      ctx.fillText(getLocalizedCompanyField('name') || 'Adraschi Amaki', 60, 125);
+      ctx.fillStyle = '#2A1F18'; ctx.font = 'bold 44px Georgia, serif';
+      const words = String(title || '').split(' ');
+      let line = ''; let y = 220;
+      for (const w of words) {
+        const test = line ? `${line} ${w}` : w;
+        if (ctx.measureText(test).width > 680) {
+          ctx.fillText(line, 60, y); line = w; y += 56;
+        } else { line = test; }
+      }
+      if (line) ctx.fillText(line, 60, y);
+      if (subtitle) {
+        ctx.fillStyle = '#6E5C4F'; ctx.font = '24px Inter, sans-serif';
+        ctx.fillText(String(subtitle).slice(0, 70), 60, y + 65);
+      }
+      return canvas.toDataURL('image/png');
+    }
+
+    async function sendImagePayload(imageSrc, title, captionText) {
+      const finalSrc = imageSrc || buildShareCardDataUrl(title, captionText, '#B45309');
+      try {
+        const res = await fetch(finalSrc);
+        const blob = await res.blob();
+        const file = new File([blob], 'adraschi-amaki.png', { type: blob.type || 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] }) && typeof navigator.share === 'function') {
+          await navigator.share({ title: title || getLocalizedCompanyField('name'), text: captionText || title, files: [file] });
+          showToast(i18n[state.lang].imgSentToast);
+          return;
+        }
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;
+      }
+
+      const link = document.createElement('a');
+      link.href = finalSrc;
+      link.download = `${(title || 'rasm').toLowerCase().replace(/[^a-z0-9]+/gi, '-')}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      const cleanHandle = (state.company.telegram || '@adraschi').replace(/^@/, '');
+      const tgUrl = `https://t.me/${encodeURIComponent(cleanHandle)}?text=${encodeURIComponent(captionText || title || '')}`;
+      if (tg && typeof tg.openTelegramLink === 'function') { tg.openTelegramLink(tgUrl); }
+      showToast(i18n[state.lang].imgSentToast);
+    }
+
+    function sendSectionImage() {
+      const t = i18n[state.lang];
+      const activeCat = state.categories.find((c) => c.id === state.selectedCategoryId);
+      const activeSub = state.subcategories.find((s) => s.id === state.selectedSubcategoryId);
+      let sectionTitle = activeCat ? getLocalizedCategoryName(activeCat) : t.all;
+      if (activeSub) sectionTitle += ` — ${getLocalizedSubcategoryName(activeSub)}`;
+
+      const firstWithImg = state.products.find(
+        (p) =>
+          p.active !== false &&
+          !isCategoryLocked(p.categoryId) &&
+          (state.selectedCategoryId === 'all' || p.categoryId === state.selectedCategoryId) &&
+          (state.selectedSubcategoryId === 'all' || p.subcategoryId === state.selectedSubcategoryId) &&
+          Array.isArray(p.images) &&
+          p.images.length > 0
+      );
+
+      const imgSrc = firstWithImg ? firstWithImg.images[0] : null;
+      sendImagePayload(imgSrc, sectionTitle, `${getLocalizedCompanyField('name')} — ${sectionTitle}`);
+    }
+
+    function sendProductImage(prodId, imgIndex = 0) {
+      const prod = state.products.find((p) => p.id === prodId);
+      if (!prod) return;
+      const pName = getLocalizedProductField(prod, 'name');
+      const pColor = getLocalizedProductField(prod, 'colorName');
+      const imgSrc = Array.isArray(prod.images) && prod.images[imgIndex] ? prod.images[imgIndex] : null;
+      const caption = `${pName}${pColor ? ` (${pColor})` : ''} — ${formatPrice(effectivePrice(prod))}`;
+      sendImagePayload(imgSrc, pName, caption);
+    }
+
+    function sendOrderToSeller() {
+      if (!state.cart.length) return;
+      const t = i18n[state.lang];
+      let total = 0;
+      const lines = state.cart.map((item, idx) => {
+        const lineSum = item.qty * item.price;
+        total += lineSum;
+        const unitLabel = item.unit === 'meter' ? t.meterUnit : t.pieceUnit;
+        const colorPart = item.colorName ? ` [${item.colorName}]` : '';
+        return `${idx + 1}. ${item.name}${colorPart} — ${item.qty} ${unitLabel} × ${formatPrice(item.price)} = ${formatPrice(lineSum)}`;
+      });
+
+      const cleanHandle = (state.company.telegram || '@adraschi').replace(/^@/, '');
+      const messageText = [
+        `🛍️ *${getLocalizedCompanyField('name')}* — ${t.sendOrder}`,
+        '',
+        ...lines,
+        '',
+        `💰 *${t.totalSum}:* ${formatPrice(total)}`,
+        `📍 *${t.addressLabel}:* ${getLocalizedCompanyField('address')}`,
+        `🚚 *${t.deliveryLabel}:* ${getLocalizedCompanyField('deliveryInfo')}`,
+        `📞 *${t.phoneLabel}:* ${state.company.phone}`
+      ].join('\n');
+
+      analytics.ordersSent += 1;
+      saveAnalytics();
+
+      const tgUrl = `https://t.me/${encodeURIComponent(cleanHandle)}?text=${encodeURIComponent(messageText)}`;
+      if (tg && typeof tg.openTelegramLink === 'function') {
+        tg.openTelegramLink(tgUrl);
+      } else {
+        window.open(tgUrl, '_blank', 'noopener,noreferrer');
+      }
+    }
+
+    function updateOnboardingTexts() {
+      const t = i18n[state.lang];
+      document.getElementById('onboardTitle').textContent = t.onboardTitle;
+      document.getElementById('onboardDesc').textContent = t.onboardDesc;
+      document.getElementById('step1Title').textContent = t.step1Title;
+      document.getElementById('step1Desc').textContent = t.step1Desc;
+      document.getElementById('step2Title').textContent = t.step2Title;
+      document.getElementById('step2Desc').textContent = t.step2Desc;
+      document.getElementById('step3Title').textContent = t.step3Title;
+      document.getElementById('step3Desc').textContent = t.step3Desc;
+      document.getElementById('closeOnboardingBtn').textContent = t.startBtn;
+    }
+
+    function updateBadges() {
+      const t = i18n[state.lang];
+      document.getElementById('brandTitle').textContent = getLocalizedCompanyField('name');
+      document.getElementById('brandSubtitle').textContent = t.brandSub;
+      document.getElementById('openAdminBtn').textContent = t.adminBtn;
+      updateOnboardingTexts();
+
+      const cartBadge = document.getElementById('cartCountBadge');
+      const totalItems = state.cart.length;
+      if (totalItems > 0) {
+        cartBadge.textContent = totalItems;
+        cartBadge.classList.remove('hidden');
+      } else {
+        cartBadge.classList.add('hidden');
+      }
+
+      const newsDot = document.getElementById('newsBadgeDot');
+      if (state.news && state.news.length > 0) {
+        newsDot.classList.remove('hidden');
+      } else {
+        newsDot.classList.add('hidden');
+      }
+
+      document.querySelectorAll('.nav-btn').forEach((btn) => {
+        const tab = btn.dataset.tab;
+        const isActive = tab === state.activeTab;
+        const labelEl = btn.querySelector('.nav-label');
+        const mapLabel = { catalog: t.catalog, news: t.news, cart: t.cart, about: t.about };
+        if (labelEl && mapLabel[tab]) labelEl.textContent = mapLabel[tab];
+        btn.classList.toggle('text-amber-800', isActive);
+        btn.classList.toggle('bg-amber-100/70', isActive);
+        btn.classList.toggle('text-[#6E5C4F]', !isActive);
+      });
+    }
+
+    function handleCategoryClick(catId) {
+      if (catId === 'all') {
+        state.selectedCategoryId = 'all';
+        state.selectedSubcategoryId = 'all';
+        render();
+        return;
+      }
+
+      const cat = state.categories.find(c => c.id === catId);
+      if (cat && cat.isExclusive) {
+        if (!state.unlockedExclusiveCategories.includes(catId)) {
+          categoryToUnlock = cat;
+          openExclusiveModal();
+          return;
+        }
+      }
+
+      state.selectedCategoryId = catId;
+      state.selectedSubcategoryId = 'all';
+      render();
+    }
+
+    function openExclusiveModal() {
+      if (!categoryToUnlock) return;
+      document.getElementById('exclusiveCatTitle').textContent = `${categoryToUnlock.icon || '🔒'} ${getLocalizedCategoryName(categoryToUnlock)}`;
+      document.getElementById('exclusivePassInput').value = '';
+      document.getElementById('exclusiveErr').classList.add('hidden');
+      document.getElementById('exclusiveModal').classList.remove('hidden');
+    }
+
+    function closeExclusiveModal() {
+      categoryToUnlock = null;
+      document.getElementById('exclusiveModal').classList.add('hidden');
+    }
+
+    function isCategoryLocked(catId) {
+      const c = state.categories.find((x) => x.id === catId);
+      return !!(c && c.isExclusive && !state.unlockedExclusiveCategories.includes(catId));
+    }
+
+    function renderCatalog() {
+      const t = i18n[state.lang];
+      const activeProducts = state.products.filter((p) => p.active !== false && !isCategoryLocked(p.categoryId));
+
+      const availableSubs =
+        state.selectedCategoryId === 'all'
+          ? state.subcategories
+          : state.subcategories.filter((s) => s.categoryId === state.selectedCategoryId);
+
+      const filtered = activeProducts.filter((p) => {
+        const matchCat = state.selectedCategoryId === 'all' || p.categoryId === state.selectedCategoryId;
+        const matchSub = state.selectedSubcategoryId === 'all' || p.subcategoryId === state.selectedSubcategoryId;
+        return matchCat && matchSub;
+      });
+
+      const catChips = [
+        `<button type="button" data-cat="all" class="cat-chip shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold border transition ${
+          state.selectedCategoryId === 'all'
+            ? 'bg-amber-700 text-white border-amber-700'
+            : 'bg-[#FFFDF9] text-[#2A1F18] border-[#E5D8C5]'
+        }">${t.all}</button>`,
+        ...state.categories.map((c) => {
+          const isLocked = c.isExclusive && !state.unlockedExclusiveCategories.includes(c.id);
+          const lockBadge = isLocked ? ' 🔒' : '';
+          return `<button type="button" data-cat="${c.id}" class="cat-chip shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5 ${
+            state.selectedCategoryId === c.id
+              ? 'bg-amber-700 text-white border-amber-700'
+              : (c.isExclusive ? 'bg-amber-50 text-amber-900 border-amber-300' : 'bg-[#FFFDF9] text-[#2A1F18] border-[#E5D8C5]')
+          }"><span>${c.icon || '🏷️'}</span><span>${getLocalizedCategoryName(c)}${lockBadge}</span></button>`;
+        })
+      ].join('');
+
+      const subChips =
+        state.selectedCategoryId !== 'all' && availableSubs.length
+          ? `<div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 pl-1">
+              <button type="button" data-sub="all" class="sub-chip shrink-0 px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition ${
+                state.selectedSubcategoryId === 'all'
+                  ? 'bg-amber-100 text-amber-900 border-amber-400'
+                  : 'bg-[#FAF6F0] text-[#6E5C4F] border-[#E5D8C5]'
+              }">${t.all}</button>
+              ${availableSubs
+                .map(
+                  (s) => `<button type="button" data-sub="${s.id}" class="sub-chip shrink-0 px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition ${
+                    state.selectedSubcategoryId === s.id
+                      ? 'bg-amber-100 text-amber-900 border-amber-400'
+                      : 'bg-[#FAF6F0] text-[#6E5C4F] border-[#E5D8C5]'
+                  }">${getLocalizedSubcategoryName(s)}</button>`
+                )
+                .join('')}
+            </div>`
+          : '';
+
+      const cardsHtml = filtered.length
+        ? filtered
+            .map((p) => {
+              const hasSale = p.salePrice && Number(p.salePrice) > 0 && Number(p.salePrice) < Number(p.price);
+              const unitLabel = p.unit === 'meter' ? t.meterUnit : t.pieceUnit;
+              const step = p.unit === 'meter' ? (Number(p.step) || 0.5) : 1;
+              const qty = getQtyForProduct(p);
+              const lineTotal = Math.round(qty * effectivePrice(p));
+              const pName = getLocalizedProductField(p, 'name');
+              const pColor = getLocalizedProductField(p, 'colorName');
+              const pDesc = getLocalizedProductField(p, 'description');
+              const imgs = Array.isArray(p.images) ? p.images : [];
+              const subObj = p.subcategoryId ? state.subcategories.find((s) => s.id === p.subcategoryId) : null;
+              const subBadge = subObj
+                ? `<span class="px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-900 text-[10px] font-semibold">${getLocalizedSubcategoryName(subObj)}</span>`
+                : '';
+
+              const galleryHtml = imgs.length
+                ? `<div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                    ${imgs
+                      .map(
+                        (src, idx) => `<div class="relative shrink-0 w-24 h-24 rounded-xl overflow-hidden border border-[#E5D8C5] bg-[#F3ECE0]">
+                          <img src="${src}" alt="${pName}" class="w-full h-full object-cover" />
+                          <button type="button" data-send-prod-img="${p.id}" data-img-idx="${idx}" class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-md bg-[#2A1F18]/80 text-white text-[10px] font-bold">📤</button>
+                        </div>`
+                      )
+                      .join('')}
+                  </div>`
+                : '';
+
+              return `
+                <article class="bg-[#FFFDF9] border border-[#E5D8C5] rounded-2xl p-4 shadow-2xs space-y-3">
+                  <div class="flex items-start justify-between gap-2">
+                    <div>
+                      <div class="flex items-center gap-1.5 flex-wrap">
+                        <h3 class="font-bold text-base text-[#2A1F18] leading-snug">${pName}</h3>
+                        ${subBadge}
+                      </div>
+                      ${
+                        pColor
+                          ? `<div class="inline-flex items-center gap-1.5 mt-1 text-xs text-[#6E5C4F]">
+                               <span class="w-3 h-3 rounded-full border border-black/15 inline-block" style="background:${p.colorHex || '#B45309'}"></span>
+                               <span>${t.colorLabel}: ${pColor}</span>
+                             </div>`
+                          : ''
+                      }
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                      <button type="button" data-send-prod-img="${p.id}" data-img-idx="0" class="px-2 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-[11px] font-semibold">
+                        📤 ${t.sendItemImg}
+                      </button>
+                      <span class="px-2.5 py-1 rounded-lg bg-[#F3ECE0] text-[#6E5C4F] text-[11px] font-semibold">
+                        1 ${unitLabel}
+                      </span>
+                    </div>
+                  </div>
+
+                  ${galleryHtml}
+
+                  ${pDesc ? `<p class="text-xs text-[#6E5C4F] leading-relaxed">${pDesc}</p>` : ''}
+
+                  <div class="flex items-baseline gap-2 pt-0.5">
+                    ${
+                      hasSale
+                        ? `<span class="text-base font-extrabold text-[#DC2626]">${formatPrice(p.salePrice)}</span>
+                           <span class="text-xs line-through text-[#6E5C4F]">${formatPrice(p.price)}</span>`
+                        : `<span class="text-base font-extrabold text-[#2A1F18]">${formatPrice(p.price)}</span>`
+                    }
+                    <span class="text-[11px] text-[#6E5C4F]">/ ${unitLabel}</span>
+                  </div>
+
+                  <div class="flex items-center justify-between gap-2 pt-2 border-t border-[#F3ECE0]">
+                    <div class="flex items-center bg-[#F3ECE0] rounded-xl border border-[#E5D8C5] overflow-hidden">
+                      <button type="button" data-qty-delta="${p.id}" data-delta="${-step}" class="px-3 py-2 text-sm font-bold text-[#2A1F18] active:bg-[#E5D8C5]">−</button>
+                      <input type="number" step="any" min="0.1" value="${qty}" data-qty-input="${p.id}" class="w-14 text-center bg-transparent text-xs font-bold text-[#2A1F18] outline-none" />
+                      <button type="button" data-qty-delta="${p.id}" data-delta="${step}" class="px-3 py-2 text-sm font-bold text-[#2A1F18] active:bg-[#E5D8C5]">+</button>
+                    </div>
+
+                    <div class="text-right">
+                      <div class="text-[10px] text-[#6E5C4F]">${qty} ${unitLabel}</div>
+                      <div class="text-xs font-bold text-[#2A1F18]">${formatPrice(lineTotal)}</div>
+                    </div>
+                  </div>
+
+                  <button type="button" data-add-cart="${p.id}" class="w-full py-2.5 rounded-xl bg-amber-700 hover:bg-amber-800 active:scale-[0.99] text-white text-xs font-bold transition">
+                    ${t.addToCart}
+                  </button>
+                </article>
+              `;
+            })
+            .join('')
+        : `<div class="bg-[#FFFDF9] border border-[#E5D8C5] rounded-2xl p-6 text-center text-xs text-[#6E5C4F]">${t.noProducts}</div>`;
+
+      return `
+        <div class="ikat-pattern rounded-2xl p-4 border border-[#E5D8C5]">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="font-display text-lg font-bold text-[#2A1F18]">${getLocalizedCompanyField('name')}</div>
+              <p class="text-xs text-[#6E5C4F] mt-0.5">${getLocalizedCompanyField('tagline')}</p>
+            </div>
+            <button id="sendSectionImgBtn" type="button" class="shrink-0 px-2.5 py-1.5 rounded-xl bg-[#FFFDF9] hover:bg-[#F3ECE0] border border-[#E5D8C5] text-[#2A1F18] text-[11px] font-bold transition">
+              📤 ${t.sendSectionImg}
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+            ${catChips}
+          </div>
+          ${subChips}
+        </div>
+
+        <div class="space-y-3">
+          ${cardsHtml}
+        </div>
+      `;
+    }
+
+    function renderNews() {
+      const t = i18n[state.lang];
+      if (!state.news || !state.news.length) {
+        return `<div class="bg-[#FFFDF9] border border-[#E5D8C5] rounded-2xl p-6 text-center text-xs text-[#6E5C4F]">${t.noNews}</div>`;
+      }
+
+      return `
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="font-display text-lg font-bold text-[#2A1F18]">${t.news}</h2>
+            <span class="text-xs text-[#6E5C4F]">${state.news.length} ${t.announcementsSuffix}</span>
+          </div>
+          ${state.news
+            .map((item) => {
+              const badgeColor =
+                item.type === 'holiday'
+                  ? 'bg-amber-100 text-amber-900 border-amber-200'
+                  : item.type === 'promo'
+                  ? 'bg-red-50 text-[#DC2626] border-red-200'
+                  : 'bg-emerald-50 text-emerald-800 border-emerald-200';
+
+              const badgeText = getLocalizedNewsField(item, 'badge') || t.news;
+              const titleText = getLocalizedNewsField(item, 'title');
+              const bodyText = getLocalizedNewsField(item, 'text');
+              const colorText = getLocalizedNewsField(item, 'colorName');
+
+              return `
+                <article class="bg-[#FFFDF9] border border-[#E5D8C5] rounded-2xl p-4 space-y-2.5">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="px-2.5 py-1 rounded-full text-[11px] font-bold border ${badgeColor}">
+                      ${badgeText}
+                    </span>
+                    <span class="text-[11px] text-[#6E5C4F]">${item.date || ''}</span>
+                  </div>
+
+                  <h3 class="font-bold text-sm text-[#2A1F18] leading-snug">${titleText}</h3>
+                  <p class="text-xs text-[#6E5C4F] leading-relaxed">${bodyText}</p>
+
+                  ${
+                    colorText
+                      ? `<div class="pt-2 border-t border-[#F3ECE0] flex items-center gap-2 text-xs font-medium text-[#2A1F18]">
+                           <span class="w-4 h-4 rounded-full border border-black/20 shrink-0" style="background:${item.colorHex || '#059669'}"></span>
+                           <span>${t.colorLabel}: <strong>${colorText}</strong></span>
+                         </div>`
+                      : ''
+                  }
+                </article>
+              `;
+            })
+            .join('')}
+        </div>
+      `;
+    }
+
+    function renderCart() {
+      const t = i18n[state.lang];
+      if (!state.cart.length) {
+        return `
+          <div class="bg-[#FFFDF9] border border-[#E5D8C5] rounded-2xl p-7 text-center space-y-3 mt-4">
+            <div class="text-3xl">🛍️</div>
+            <h2 class="font-display text-lg font-bold text-[#2A1F18]">${t.emptyCart}</h2>
+            <p class="text-xs text-[#6E5C4F]">${t.emptyCartDesc}</p>
+            <button id="goCatalogFromCartBtn" type="button" class="px-4 py-2.5 rounded-xl bg-amber-700 text-white text-xs font-bold">
+              ${t.goCatalog}
+            </button>
+          </div>
+        `;
+      }
+
+      let grandTotal = 0;
+      const rowsHtml = state.cart
+        .map((item, idx) => {
+          const sum = Math.round(item.qty * item.price);
+          grandTotal += sum;
+          const unitLabel = item.unit === 'meter' ? t.meterUnit : t.pieceUnit;
+          const step = item.unit === 'meter' ? 0.5 : 1;
+
+          return `
+            <div class="bg-[#FFFDF9] border border-[#E5D8C5] rounded-2xl p-3.5 space-y-2.5">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="font-bold text-sm text-[#2A1F18]">${item.name}</div>
+                  <div class="text-[11px] text-[#6E5C4F]">
+                    ${formatPrice(item.price)} / ${unitLabel}${item.colorName ? ` · ${item.colorName}` : ''}
+                  </div>
+                </div>
+                <div class="text-sm font-extrabold text-[#2A1F18] shrink-0">${formatPrice(sum)}</div>
+              </div>
+
+              <div class="flex items-center justify-between pt-2 border-t border-[#F3ECE0]">
+                <div class="flex items-center bg-[#F3ECE0] rounded-xl border border-[#E5D8C5]">
+                  <button type="button" data-cart-delta="${idx}" data-delta="${-step}" class="px-3 py-1.5 text-sm font-bold text-[#2A1F18]">−</button>
+                  <span class="px-2.5 text-xs font-bold text-[#2A1F18]">${item.qty} ${unitLabel}</span>
+                  <button type="button" data-cart-delta="${idx}" data-delta="${step}" class="px-3 py-1.5 text-sm font-bold text-[#2A1F18]">+</button>
+                </div>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+
+      return `
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="font-display text-lg font-bold text-[#2A1F18]">${t.cart}</h2>
+            <button id="clearCartBtn" type="button" class="text-xs font-semibold text-[#DC2626]">${t.clearCart}</button>
+          </div>
+
+          <div class="space-y-2.5">${rowsHtml}</div>
+
+          <div class="bg-[#FFFDF9] border border-[#E5D8C5] rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-semibold text-[#6E5C4F]">${t.totalSum}</span>
+              <span class="text-lg font-extrabold text-[#2A1F18]">${formatPrice(grandTotal)}</span>
+            </div>
+
+            <button id="sendOrderBtn" type="button" class="w-full py-3 rounded-xl bg-amber-700 hover:bg-amber-800 text-white text-sm font-bold transition">
+              ${t.sendOrder}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAbout() {
+      const t = i18n[state.lang];
+      const c = state.company;
+      const cleanPhone = (c.phone || '97-788-88-84').replace(/[^\d+]/g, '');
+      const cleanTg = (c.telegram || '@adraschi').replace(/^@/, '');
+
+      return `
+        <div class="space-y-3">
+          <div class="ikat-pattern border border-[#E5D8C5] rounded-2xl p-4 space-y-1.5">
+            <h2 class="font-display text-xl font-bold text-[#2A1F18]">${getLocalizedCompanyField('name')}</h2>
+            <p class="text-xs text-[#6E5C4F] leading-relaxed">${getLocalizedCompanyField('tagline')}</p>
+          </div>
+
+          <div class="bg-[#FFFDF9] border border-[#E5D8C5] rounded-2xl p-4 space-y-3 text-xs">
+            <div class="pb-2.5 border-b border-[#F3ECE0]">
+              <div class="text-[#6E5C4F] font-medium mb-0.5">${t.addressLabel}</div>
+              <div class="font-bold text-sm text-[#2A1F18]">📍 ${getLocalizedCompanyField('address')}</div>
+            </div>
+
+            <div class="pb-2.5 border-b border-[#F3ECE0]">
+              <div class="text-[#6E5C4F] font-medium mb-0.5">${t.deliveryLabel}</div>
+              <div class="font-semibold text-[#2A1F18] leading-relaxed">🚚 ${getLocalizedCompanyField('deliveryInfo')}</div>
+            </div>
+
+            <div class="pb-2.5 border-b border-[#F3ECE0] flex items-center justify-between gap-2">
+              <div>
+                <div class="text-[#6E5C4F] font-medium mb-0.5">${t.phoneLabel}</div>
+                <div class="font-bold text-sm text-[#2A1F18]">📞 ${c.phone}</div>
+              </div>
+              <a href="tel:${cleanPhone}" class="px-3 py-2 rounded-xl bg-[#F3ECE0] text-[#2A1F18] font-bold">${t.callBtn}</a>
+            </div>
+
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <div class="text-[#6E5C4F] font-medium mb-0.5">${t.telegramLabel}</div>
+                <div class="font-bold text-sm text-amber-800">@${cleanTg}</div>
+              </div>
+              <a href="https://t.me/${cleanTg}" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-xl bg-amber-700 text-white font-bold">${t.writeBtn}</a>
+            </div>
+          </div>
+
+          <button id="reopenOnboardingBtn" type="button" class="w-full py-2.5 rounded-xl bg-[#F3ECE0] border border-[#E5D8C5] text-[#2A1F18] text-xs font-bold">
+            ${t.helpGuide}
+          </button>
+        </div>
+      `;
+    }
+
+    function render() {
+      updateBadges();
+      const main = document.getElementById('mainContent');
+      if (state.activeTab === 'catalog') {
+        main.innerHTML = renderCatalog();
+      } else if (state.activeTab === 'news') {
+        main.innerHTML = renderNews();
+      } else if (state.activeTab === 'cart') {
+        main.innerHTML = renderCart();
+      } else if (state.activeTab === 'about') {
+        main.innerHTML = renderAbout();
+      }
+      bindDynamicEvents();
+    }
+
+    function bindDynamicEvents() {
+      const sendSectionBtn = document.getElementById('sendSectionImgBtn');
+      if (sendSectionBtn) sendSectionBtn.addEventListener('click', sendSectionImage);
+
+      document.querySelectorAll('[data-send-prod-img]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          sendProductImage(btn.dataset.sendProdImg, parseInt(btn.dataset.imgIdx || '0', 10));
+        });
+      });
+
+      document.querySelectorAll('.cat-chip').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          handleCategoryClick(btn.dataset.cat);
+        });
+      });
+
+      document.querySelectorAll('.sub-chip').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.selectedSubcategoryId = btn.dataset.sub;
+          render();
+        });
+      });
+
+      document.querySelectorAll('[data-qty-delta]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          changeQty(btn.dataset.qtyDelta, parseFloat(btn.dataset.delta));
+        });
+      });
+
+      document.querySelectorAll('[data-qty-input]').forEach((inp) => {
+        inp.addEventListener('change', () => {
+          setExactQty(inp.dataset.qtyInput, inp.value);
+        });
+      });
+
+      document.querySelectorAll('[data-add-cart]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          addToCart(btn.dataset.addCart);
+        });
+      });
+
+      document.querySelectorAll('[data-cart-delta]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          updateCartItemQty(parseInt(btn.dataset.cartDelta, 10), parseFloat(btn.dataset.delta));
+        });
+      });
+
+      const clearCartBtn = document.getElementById('clearCartBtn');
+      if (clearCartBtn) clearCartBtn.addEventListener('click', clearCart);
+
+      const sendOrderBtn = document.getElementById('sendOrderBtn');
+      if (sendOrderBtn) sendOrderBtn.addEventListener('click', sendOrderToSeller);
+
+      const goCatalogBtn = document.getElementById('goCatalogFromCartBtn');
+      if (goCatalogBtn) {
+        goCatalogBtn.addEventListener('click', () => {
+          state.activeTab = 'catalog';
+          render();
+        });
+      }
+
+      const reopenBtn = document.getElementById('reopenOnboardingBtn');
+      if (reopenBtn) {
+        reopenBtn.addEventListener('click', () => {
+          updateOnboardingTexts();
+          document.getElementById('onboardingModal').classList.remove('hidden');
+        });
+      }
+    }
+
+    // Modal listeners
+    document.getElementById('closeExclusiveModalBtn').addEventListener('click', closeExclusiveModal);
+    document.getElementById('submitExclusivePassBtn').addEventListener('click', () => {
+      const inputVal = document.getElementById('exclusivePassInput').value.trim();
+      if (categoryToUnlock && (inputVal === categoryToUnlock.passcode || inputVal === (state.auth && state.auth.masterCode))) {
+        if (!state.unlockedExclusiveCategories.includes(categoryToUnlock.id)) {
+          state.unlockedExclusiveCategories.push(categoryToUnlock.id);
+          saveState();
+        }
+        state.selectedCategoryId = categoryToUnlock.id;
+        state.selectedSubcategoryId = 'all';
+        closeExclusiveModal();
+        render();
+      } else {
+        document.getElementById('exclusiveErr').classList.remove('hidden');
+      }
+    });
+
+    // Reorder Helpers
+    function moveCategory(index, direction) {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= state.categories.length) return;
+      const temp = state.categories[index];
+      state.categories[index] = state.categories[targetIndex];
+      state.categories[targetIndex] = temp;
+      saveState();
+      render();
+      renderAdminModal();
+    }
+
+    function moveSubcategory(catId, index, direction) {
+      const subsOfCat = state.subcategories.filter(s => s.categoryId === catId);
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= subsOfCat.length) return;
+
+      const item1 = subsOfCat[index];
+      const item2 = subsOfCat[targetIndex];
+
+      const idx1 = state.subcategories.findIndex(s => s.id === item1.id);
+      const idx2 = state.subcategories.findIndex(s => s.id === item2.id);
+
+      if (idx1 !== -1 && idx2 !== -1) {
+        const temp = state.subcategories[idx1];
+        state.subcategories[idx1] = state.subcategories[idx2];
+        state.subcategories[idx2] = temp;
+        saveState();
+        render();
+        renderAdminModal();
+      }
+    }
+
+    // Admin Modal Logic
+    function openAdminModal() {
+      const modal = document.getElementById('adminModal');
+      modal.classList.remove('hidden');
+      if (!adminUnlocked) adminLoginStep = 1;
+      if (!adminSubParentCatId && state.categories[0]) {
+        adminSubParentCatId = state.categories[0].id;
+      }
+      renderAdminModal();
+    }
+
+    function closeAdminModal() {
+      document.getElementById('adminModal').classList.add('hidden');
+    }
+
+    function renderAdminModal() {
+      const card = document.getElementById('adminModalCard');
+      const t = i18n[state.lang];
+      const masterCode = (state.auth && state.auth.masterCode) || 'adraschi';
+      const numericPin = (state.auth && state.auth.numericPin) || '1234';
+
+      if (!adminUnlocked) {
+        if (adminLoginStep === 1) {
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <h3 class="font-display font-bold text-base text-[#2A1F18]">${t.adminLoginTitle}</h3>
+              <button id="closeAdminX" type="button" class="text-sm font-bold text-[#6E5C4F] px-2">✕</button>
+            </div>
+            <label class="block text-xs font-semibold text-[#6E5C4F]">${t.step1CodeLabel}</label>
+            <input id="adminMasterInput" type="password" placeholder="${t.step1CodePlaceholder}" class="w-full bg-[#FAF6F0] border border-[#E5D8C5] rounded-xl px-3.5 py-2.5 text-sm text-[#2A1F18] outline-none" />
+            <div id="adminCodeError" class="hidden text-xs font-semibold text-[#DC2626]">${t.adminCodeError}</div>
+            <button id="nextStepBtn" type="button" class="w-full py-2.5 rounded-xl bg-amber-700 text-white text-xs font-bold">${t.nextStepBtn}</button>
+          `;
+          document.getElementById('closeAdminX').addEventListener('click', closeAdminModal);
+          document.getElementById('nextStepBtn').addEventListener('click', () => {
+            const val = document.getElementById('adminMasterInput').value.trim();
+            if (val === masterCode) {
+              adminLoginStep = 2;
+              renderAdminModal();
+            } else {
+              document.getElementById('adminCodeError').classList.remove('hidden');
+            }
+          });
+          return;
+        }
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <h3 class="font-display font-bold text-base text-[#2A1F18]">${t.adminLoginTitle}</h3>
+            <button id="closeAdminX" type="button" class="text-sm font-bold text-[#6E5C4F] px-2">✕</button>
+          </div>
+          <label class="block text-xs font-semibold text-[#6E5C4F]">${t.step2PinLabel}</label>
+          <input id="adminPinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" placeholder="${t.step2PinPlaceholder}" class="w-full bg-[#FAF6F0] border border-[#E5D8C5] rounded-xl px-3.5 py-2.5 text-sm text-[#2A1F18] outline-none" />
+          <div id="adminCodeError" class="hidden text-xs font-semibold text-[#DC2626]">${t.adminCodeError}</div>
+          <div class="flex gap-2">
+            <button id="backStepBtn" type="button" class="w-1/3 py-2.5 rounded-xl bg-[#F3ECE0] text-[#2A1F18] text-xs font-bold">${t.backStepBtn}</button>
+            <button id="submitAdminPinBtn" type="button" class="w-2/3 py-2.5 rounded-xl bg-amber-700 text-white text-xs font-bold">${t.loginBtn}</button>
+          </div>
+        `;
+        document.getElementById('closeAdminX').addEventListener('click', closeAdminModal);
+        document.getElementById('backStepBtn').addEventListener('click', () => {
+          adminLoginStep = 1;
+          renderAdminModal();
+        });
+        document.getElementById('submitAdminPinBtn').addEventListener('click', () => {
+          const pin = document.getElementById('adminPinInput').value.trim();
+          if (pin === numericPin) {
+            adminUnlocked = true;
+            adminLoginStep = 1;
+            renderAdminModal();
+          } else {
+            document.getElementById('adminCodeError').classList.remove('hidden');
+          }
+        });
+        return;
+      }
+
+      const convRate = analytics.visits > 0 ? ((analytics.ordersSent / analytics.visits) * 100).toFixed(1) : '0.0';
+
+      card.innerHTML = `
+        <div class="flex items-center justify-between border-b border-[#E5D8C5] pb-2.5">
+          <h3 class="font-display font-bold text-base text-[#2A1F18]">${t.adminTitle}</h3>
+          <div class="flex items-center gap-2">
+            <button id="lockAdminBtn" type="button" class="text-[11px] font-semibold text-[#6E5C4F] bg-[#F3ECE0] px-2 py-1 rounded-lg">${t.lockBtn}</button>
+            <button id="closeAdminX" type="button" class="text-sm font-bold text-[#6E5C4F] px-1.5">✕</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="p-2.5 rounded-xl bg-[#FAF6F0] border border-[#E5D8C5]">
+            <div class="text-[10px] text-[#6E5C4F]">${t.visitsLabel}</div>
+            <div class="text-sm font-extrabold text-[#2A1F18]">${analytics.visits}</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-[#FAF6F0] border border-[#E5D8C5]">
+            <div class="text-[10px] text-[#6E5C4F]">${t.ordersLabel}</div>
+            <div class="text-sm font-extrabold text-[#2A1F18]">${analytics.ordersSent}</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-[#FAF6F0] border border-[#E5D8C5]">
+            <div class="text-[10px] text-[#6E5C4F]">${t.conversionLabel}</div>
+            <div class="text-sm font-extrabold text-amber-800">${convRate}%</div>
+          </div>
+        </div>
+
+        <div class="flex gap-1.5 overflow-x-auto no-scrollbar">
+          <button type="button" data-adm-tab="products" class="adm-tab shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold ${adminTab === 'products' ? 'bg-amber-700 text-white' : 'bg-[#F3ECE0] text-[#2A1F18]'}">${t.admTabProducts}</button>
+          <button type="button" data-adm-tab="categories" class="adm-tab shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold ${adminTab === 'categories' ? 'bg-amber-700 text-white' : 'bg-[#F3ECE0] text-[#2A1F18]'}">${t.admTabCategories}</button>
+          <button type="button" data-adm-tab="news" class="adm-tab shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold ${adminTab === 'news' ? 'bg-amber-700 text-white' : 'bg-[#F3ECE0] text-[#2A1F18]'}">${t.admTabNews}</button>
+          <button type="button" data-adm-tab="codes" class="adm-tab shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold ${adminTab === 'codes' ? 'bg-amber-700 text-white' : 'bg-[#F3ECE0] text-[#2A1F18]'}">${t.admTabCodes}</button>
+          <button type="button" data-adm-tab="company" class="adm-tab shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold ${adminTab === 'company' ? 'bg-amber-700 text-white' : 'bg-[#F3ECE0] text-[#2A1F18]'}">${t.admTabCompany}</button>
+        </div>
+
+        <div id="adminBody" class="space-y-3 text-xs"></div>
+      `;
+
+      document.getElementById('closeAdminX').addEventListener('click', closeAdminModal);
+      document.getElementById('lockAdminBtn').addEventListener('click', () => {
+        adminUnlocked = false;
+        adminLoginStep = 1;
+        editingProductId = null; editingCategoryId = null; editingSubcategoryId = null; editingNewsId = null;
+        draftProductImages = [];
+        adminProdDraft = null;
+        renderAdminModal();
+      });
+
+      card.querySelectorAll('.adm-tab').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          adminTab = btn.dataset.admTab;
+          renderAdminModal();
+        });
+      });
+
+      const body = document.getElementById('adminBody');
+
+      if (adminTab === 'products') {
+        const editingProd = editingProductId ? state.products.find((p) => p.id === editingProductId) : null;
+        const formTitle = editingProd ? t.editProdTitle : t.addProdTitle;
+        const d = adminProdDraft;
+        const initName = d ? d.name : (editingProd ? editingProd.name : '');
+        const initCat = adminProdFormCatId || (editingProd ? editingProd.categoryId : (state.categories[0] ? state.categories[0].id : ''));
+        const subsForCat = state.subcategories.filter((s) => s.categoryId === initCat);
+        const initSub = d ? d.sub : (editingProd ? (editingProd.subcategoryId || '') : '');
+        const initPrice = d ? d.price : (editingProd ? editingProd.price : '');
+        const initSale = d ? d.sale : (editingProd && editingProd.salePrice ? editingProd.salePrice : '');
+        const initUnit = d ? d.unit : (editingProd ? editingProd.unit : 'meter');
+        const initColor = d ? d.color : (editingProd ? editingProd.colorName : '');
+
+        const draftThumbs = draftProductImages.length
+          ? `<div class="flex flex-wrap gap-1.5 pt-1">
+              ${draftProductImages.map((src, idx) => `<div class="relative w-14 h-14 rounded-lg overflow-hidden border border-[#E5D8C5]">
+                    <img src="${src}" class="w-full h-full object-cover" />
+                    <button type="button" data-rm-draft-img="${idx}" class="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-600 text-white text-[10px] font-bold leading-none">✕</button>
+                  </div>`).join('')}
+            </div>`
+          : '';
+
+        const activeList = state.products.filter((p) => p.active !== false);
+        const archivedList = state.products.filter((p) => p.active === false);
+
+        body.innerHTML = `
+          <div class="p-3 rounded-xl bg-[#FAF6F0] border border-[#E5D8C5] space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="font-bold text-[#2A1F18]">${formTitle}</div>
+              ${editingProd ? `<button id="cancelEditProdBtn" type="button" class="text-[11px] font-semibold text-[#6E5C4F]">${t.cancelEditBtn}</button>` : ''}
+            </div>
+            <input id="newProdName" type="text" value="${String(initName).replace(/"/g, '&quot;')}" placeholder="${t.prodNamePlaceholder}" class="w-full bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2.5 py-2" />
+            <div class="grid grid-cols-2 gap-2">
+              <select id="newProdCat" class="bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2 py-2">
+                ${state.categories.map((c) => `<option value="${c.id}" ${c.id === initCat ? 'selected' : ''}>${getLocalizedCategoryName(c)}</option>`).join('')}
+              </select>
+              <select id="newProdSub" class="bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2 py-2">
+                <option value="">${t.noSubSelect}</option>
+                ${subsForCat.map((s) => `<option value="${s.id}" ${s.id === initSub ? 'selected' : ''}>${getLocalizedSubcategoryName(s)}</option>`).join('')}
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <input id="newProdPrice" type="number" value="${initPrice}" placeholder="${t.prodPricePlaceholder}" class="bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2.5 py-2" />
+              <input id="newProdSale" type="number" value="${initSale}" placeholder="${t.prodSalePlaceholder}" class="bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2.5 py-2" />
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <select id="newProdUnit" class="bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2 py-2">
+                <option value="meter" ${initUnit === 'meter' ? 'selected' : ''}>${t.unitMeter}</option>
+                <option value="piece" ${initUnit === 'piece' ? 'selected' : ''}>${t.unitPiece}</option>
+              </select>
+              <input id="newProdColor" type="text" value="${String(initColor).replace(/"/g, '&quot;')}" placeholder="${t.prodColorPlaceholder}" class="bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2.5 py-2" />
+            </div>
+            <div class="space-y-1">
+              <label class="block text-[11px] font-semibold text-[#6E5C4F]">${t.addImagesLabel}</label>
+              <input id="newProdImages" type="file" accept="image/*" multiple class="w-full bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2 py-1.5 text-[11px]" />
+              <div id="draftImgCount" class="text-[11px] text-amber-800 font-semibold">${draftProductImages.length} ${t.imagesSelectedCount}</div>
+              ${draftThumbs}
+            </div>
+            <button id="addProdBtn" type="button" class="w-full py-2 rounded-lg bg-amber-700 text-white font-bold">${editingProd ? t.saveBtn : t.addBtn}</button>
+          </div>
+
+          <div class="space-y-1.5 max-h-48 overflow-y-auto">
+            <div class="font-bold text-[#2A1F18] text-[11px]">${t.activeProductsTitle} (${activeList.length})</div>
+            ${activeList.map((p) => {
+                const sub = p.subcategoryId ? state.subcategories.find((s) => s.id === p.subcategoryId) : null;
+                return `<div class="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF6F0] border border-[#E5D8C5] gap-2">
+                  <div class="min-w-0">
+                    <div class="font-bold text-[#2A1F18] truncate">${getLocalizedProductField(p, 'name')} (${(p.images || []).length})</div>
+                    <div class="text-[11px] text-[#6E5C4F]">${formatPrice(effectivePrice(p))} / ${p.unit === 'meter' ? t.meterUnit : t.pieceUnit}${sub ? ` · ${getLocalizedSubcategoryName(sub)}` : ''}</div>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <button type="button" data-edit-prod="${p.id}" class="text-blue-700 font-bold">${t.editBtn}</button>
+                    <button type="button" data-archive-prod="${p.id}" class="text-amber-800 font-bold">${t.archiveBtn}</button>
+                    <button type="button" data-del-prod="${p.id}" class="text-[#DC2626] font-bold">${t.deleteBtn}</button>
+                  </div>
+                </div>`;
+              }).join('')}
+
+            ${archivedList.length ? `<div class="font-bold text-[#6E5C4F] text-[11px] pt-2">${t.archivedProductsTitle} (${archivedList.length})</div>
+                   ${archivedList.map((p) => `<div class="flex items-center justify-between p-2.5 rounded-xl bg-[#F3ECE0]/70 border border-[#E5D8C5] gap-2 opacity-85">
+                         <div class="min-w-0">
+                           <div class="font-bold text-[#2A1F18] truncate">${getLocalizedProductField(p, 'name')} <span class="text-[10px] text-[#6E5C4F]">(${t.archivedBadge})</span></div>
+                         </div>
+                         <div class="flex items-center gap-2 shrink-0">
+                           <button type="button" data-edit-prod="${p.id}" class="text-blue-700 font-bold">${t.editBtn}</button>
+                           <button type="button" data-unarchive-prod="${p.id}" class="text-emerald-700 font-bold">${t.unarchiveBtn}</button>
+                           <button type="button" data-del-prod="${p.id}" class="text-[#DC2626] font-bold">${t.deleteBtn}</button>
+                         </div>
+                       </div>`).join('')}` : ''}
+          </div>
+        `;
+
+        const prodCatSel = document.getElementById('newProdCat');
+        if (prodCatSel) {
+          prodCatSel.addEventListener('change', (e) => {
+            captureProdForm(true);
+            adminProdFormCatId = e.target.value;
+            renderAdminModal();
+          });
+        }
+
+        const cancelEditBtn = document.getElementById('cancelEditProdBtn');
+        if (cancelEditBtn) {
+          cancelEditBtn.addEventListener('click', () => {
+            editingProductId = null; adminProdFormCatId = ''; draftProductImages = [];
+            adminProdDraft = null;
+            renderAdminModal();
+          });
+        }
+
+        const fileInp = document.getElementById('newProdImages');
+        if (fileInp) {
+          fileInp.addEventListener('change', async (e) => {
+            captureProdForm(false);
+            const files = Array.from(e.target.files || []);
+            for (const file of files) {
+              const dataUrl = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => resolve(null);
+                reader.readAsDataURL(file);
+              });
+              if (dataUrl) draftProductImages.push(dataUrl);
+            }
+            renderAdminModal();
+          });
+        }
+
+        body.querySelectorAll('[data-rm-draft-img]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            captureProdForm(false);
+            draftProductImages.splice(parseInt(btn.dataset.rmDraftImg, 10), 1);
+            renderAdminModal();
+          });
+        });
+
+        body.querySelectorAll('[data-edit-prod]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const target = state.products.find((p) => p.id === btn.dataset.editProd);
+            if (!target) return;
+            editingProductId = target.id;
+            adminProdDraft = null;
+            adminProdFormCatId = target.categoryId;
+            draftProductImages = Array.isArray(target.images) ? [...target.images] : [];
+            renderAdminModal();
+          });
+        });
+
+        document.getElementById('addProdBtn').addEventListener('click', () => {
+          const name = document.getElementById('newProdName').value.trim();
+          const categoryId = document.getElementById('newProdCat').value;
+          const subcategoryId = document.getElementById('newProdSub').value;
+          const price = parseFloat(document.getElementById('newProdPrice').value);
+          const saleVal = parseFloat(document.getElementById('newProdSale').value);
+          const unit = document.getElementById('newProdUnit').value;
+          const colorName = document.getElementById('newProdColor').value.trim();
+          if (!name || isNaN(price) || price <= 0) return;
+
+          if (editingProductId) {
+            const target = state.products.find((p) => p.id === editingProductId);
+            if (target) {
+              target.name = name; target.categoryId = categoryId; target.subcategoryId = subcategoryId;
+              target.price = price; target.salePrice = !isNaN(saleVal) && saleVal > 0 ? saleVal : null;
+              target.unit = unit; target.step = unit === 'meter' ? 0.5 : 1;
+              target.colorName = colorName || 'Tabiiy'; target.images = [...draftProductImages];
+            }
+            editingProductId = null;
+          } else {
+            state.products.unshift({
+              id: 'prod-' + Date.now(), categoryId, subcategoryId, name, price,
+              salePrice: !isNaN(saleVal) && saleVal > 0 ? saleVal : null,
+              unit, step: unit === 'meter' ? 0.5 : 1, colorName: colorName || 'Tabiiy',
+              colorHex: '#B45309', description: '', images: [...draftProductImages], active: true
+            });
+          }
+          adminProdFormCatId = ''; draftProductImages = [];
+          adminProdDraft = null;
+          saveState(); render(); renderAdminModal(); showToast(t.savedToast);
+        });
+
+        body.querySelectorAll('[data-archive-prod]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const target = state.products.find((p) => p.id === btn.dataset.archiveProd);
+            if (target) { target.active = false; saveState(); render(); renderAdminModal(); }
+          });
+        });
+
+        body.querySelectorAll('[data-unarchive-prod]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const target = state.products.find((p) => p.id === btn.dataset.unarchiveProd);
+            if (target) { target.active = true; saveState(); render(); renderAdminModal(); }
+          });
+        });
+
+        body.querySelectorAll('[data-del-prod]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            if (editingProductId === btn.dataset.delProd) { editingProductId = null; draftProductImages = []; adminProdDraft = null; }
+            state.products = state.products.filter((p) => p.id !== btn.dataset.delProd);
+            saveState(); render(); renderAdminModal();
+          });
+        });
+      } else if (adminTab === 'categories') {
+        const editingCat = editingCategoryId ? state.categories.find((c) => c.id === editingCategoryId) : null;
+        const initCatName = editingCat ? editingCat.name : '';
+        const initCatIcon = editingCat ? (editingCat.icon || '🏷️') : '🏷️';
+        const initCatExcl = editingCat ? editingCat.isExclusive : false;
+        const initCatPass = editingCat ? (editingCat.passcode || '') : '';
+
+        if (!adminSubParentCatId && state.categories[0]) {
+          adminSubParentCatId = state.categories[0].id;
+        }
+
+        const editingSub = editingSubcategoryId ? state.subcategories.find((s) => s.id === editingSubcategoryId) : null;
+        const initSubName = editingSub ? editingSub.name : '';
+        const parentCatForSub = editingSub ? editingSub.categoryId : adminSubParentCatId;
+        const currentSubs = state.subcategories.filter((s) => s.categoryId === parentCatForSub);
+
+        body.innerHTML = `
+          <!-- Katta Bo'limlar Formasi -->
+          <div class="p-3 rounded-xl bg-[#FAF6F0] border border-[#E5D8C5] space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="font-bold text-[#2A1F18]">${editingCat ? t.editCategoryTitle : t.mainCategoriesTitle}</div>
+              ${editingCat ? `<button id="cancelEditCatBtn" type="button" class="text-[11px] font-semibold text-[#6E5C4F]">${t.cancelEditBtn}</button>` : ''}
+            </div>
+            <div class="flex gap-2">
+              <input id="newCatIconInput" type="text" value="${String(initCatIcon).replace(/"/g, '&quot;')}" maxlength="4" class="w-12 text-center bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2 py-2" />
+              <input id="newCatNameInput" type="text" value="${String(initCatName).replace(/"/g, '&quot;')}" placeholder="${t.addCategoryPlaceholder}" class="flex-1 bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2.5 py-2" />
+            </div>
+
+            <div class="flex items-center justify-between bg-[#FFFDF9] p-2 rounded-lg border border-[#E5D8C5]">
+              <label class="flex items-center gap-1.5 text-xs font-semibold text-amber-900 cursor-pointer">
+                <input id="newCatIsExcl" type="checkbox" ${initCatExcl ? 'checked' : ''} class="rounded text-amber-700 focus:ring-amber-700" />
+                <span>🔒 Eksklyuziv bo'lim</span>
+              </label>
+              <input id="newCatPass" type="text" value="${String(initCatPass).replace(/"/g, '&quot;')}" placeholder="Kirish kodi" class="w-24 bg-[#FAF6F0] border border-[#E5D8C5] rounded px-2 py-1 text-xs font-bold text-center" />
+            </div>
+
+            <button id="addCatBtn" type="button" class="w-full py-2 rounded-lg bg-amber-700 text-white font-bold">${editingCat ? t.saveBtn : t.addBtn}</button>
+          </div>
+
+          <!-- Katta Bo'limlar Ro'yxati (Tartiblash bilan) -->
+          <div class="space-y-1.5 max-h-36 overflow-y-auto">
+            ${state.categories
+              .map(
+                (c, idx) => `<div class="flex items-center justify-between p-2 rounded-xl bg-[#FAF6F0] border border-[#E5D8C5] font-semibold text-[#2A1F18] gap-2">
+                  <div class="flex items-center gap-1 min-w-0">
+                    <button type="button" data-move-cat="${idx}" data-dir="-1" class="px-1.5 py-0.5 rounded bg-[#FFFDF9] border border-[#E5D8C5] text-xs font-bold text-[#6E5C4F]">⬆</button>
+                    <button type="button" data-move-cat="${idx}" data-dir="1" class="px-1.5 py-0.5 rounded bg-[#FFFDF9] border border-[#E5D8C5] text-xs font-bold text-[#6E5C4F]">⬇</button>
+                    <span class="truncate ml-1">${c.icon || '🏷️'} ${getLocalizedCategoryName(c)}${c.isExclusive ? ' 🔒' : ''}</span>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <button type="button" data-edit-cat="${c.id}" class="text-blue-700 font-bold">${t.editBtn}</button>
+                    <button type="button" data-del-cat="${c.id}" class="text-[#DC2626] font-bold">${t.deleteBtn}</button>
+                  </div>
+                </div>`
+              )
+              .join('')}
+          </div>
+
+          <!-- Kichik Bo'limlar Formasi & Tartiblash -->
+          <div class="p-3 rounded-xl bg-amber-50/60 border border-amber-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="font-bold text-[#2A1F18]">${editingSub ? t.editSubCategoryTitle : t.subCategoriesTitle}</div>
+              ${editingSub ? `<button id="cancelEditSubBtn" type="button" class="text-[11px] font-semibold text-[#6E5C4F]">${t.cancelEditBtn}</button>` : ''}
+            </div>
+            <select id="subParentCatSelect" class="w-full bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2.5 py-2 font-semibold">
+              ${state.categories.map((c) => `<option value="${c.id}" ${c.id === parentCatForSub ? 'selected' : ''}>${c.icon || '🏷️'} ${getLocalizedCategoryName(c)}</option>`).join('')}
+            </select>
+            <div class="flex gap-2">
+              <input id="newSubNameInput" type="text" value="${String(initSubName).replace(/"/g, '&quot;')}" placeholder="${t.addSubCategoryPlaceholder}" class="flex-1 bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2.5 py-2" />
+              <button id="addSubBtn" type="button" class="px-3 py-2 rounded-lg bg-amber-700 text-white font-bold shrink-0">${editingSub ? t.saveBtn : t.addBtn}</button>
+            </div>
+            <div class="space-y-1.5 max-h-32 overflow-y-auto pt-1">
+              ${currentSubs
+                .map(
+                  (s, sIdx) => `<div class="flex items-center justify-between p-1.5 rounded-lg bg-[#FFFDF9] border border-[#E5D8C5] font-semibold text-[#2A1F18] gap-2">
+                    <div class="flex items-center gap-1 min-w-0">
+                      <button type="button" data-move-sub="${sIdx}" data-dir="-1" class="px-1.5 py-0.5 rounded bg-[#FAF6F0] border border-[#E5D8C5] text-[10px] font-bold text-[#6E5C4F]">⬆</button>
+                      <button type="button" data-move-sub="${sIdx}" data-dir="1" class="px-1.5 py-0.5 rounded bg-[#FAF6F0] border border-[#E5D8C5] text-[10px] font-bold text-[#6E5C4F]">⬇</button>
+                      <span class="truncate ml-1">↳ ${getLocalizedSubcategoryName(s)}</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                      <button type="button" data-edit-sub="${s.id}" class="text-blue-700 font-bold">${t.editBtn}</button>
+                      <button type="button" data-del-sub="${s.id}" class="text-[#DC2626] font-bold">${t.deleteBtn}</button>
+                    </div>
+                  </div>`
+                )
+                .join('')}
+            </div>
+          </div>
+        `;
+
+        // Tartiblash hodisalari
+        body.querySelectorAll('[data-move-cat]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            moveCategory(parseInt(btn.dataset.moveCat, 10), parseInt(btn.dataset.dir, 10));
+          });
+        });
+
+        body.querySelectorAll('[data-move-sub]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const catId = document.getElementById('subParentCatSelect').value;
+            moveSubcategory(catId, parseInt(btn.dataset.moveSub, 10), parseInt(btn.dataset.dir, 10));
+          });
+        });
+
+        const cancelEditCatBtn = document.getElementById('cancelEditCatBtn');
+        if (cancelEditCatBtn) {
+          cancelEditCatBtn.addEventListener('click', () => { editingCategoryId = null; renderAdminModal(); });
+        }
+
+        body.querySelectorAll('[data-edit-cat]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const target = state.categories.find((c) => c.id === btn.dataset.editCat);
+            if (!target) return;
+            editingCategoryId = target.id;
+            renderAdminModal();
+          });
+        });
+
+        document.getElementById('addCatBtn').addEventListener('click', () => {
+          const name = (document.getElementById('newCatNameInput').value || '').trim();
+          const icon = (document.getElementById('newCatIconInput').value || '').trim() || '🏷️';
+          const isExclusive = document.getElementById('newCatIsExcl').checked;
+          const passcode = (document.getElementById('newCatPass').value || '').trim();
+          if (!name) return;
+
+          if (editingCategoryId) {
+            const target = state.categories.find((c) => c.id === editingCategoryId);
+            if (target) {
+              target.name = name; target.icon = icon; target.isExclusive = isExclusive; target.passcode = passcode;
+            }
+            editingCategoryId = null;
+          } else {
+            const newId = 'cat-' + Date.now();
+            state.categories.push({ id: newId, name, icon, isExclusive, passcode });
+            adminSubParentCatId = newId;
+          }
+
+          saveState(); render(); renderAdminModal(); showToast(t.savedToast);
+        });
+
+        body.querySelectorAll('[data-del-cat]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const catId = btn.dataset.delCat;
+            if (editingCategoryId === catId) editingCategoryId = null;
+            state.categories = state.categories.filter((c) => c.id !== catId);
+            state.subcategories = state.subcategories.filter((s) => s.categoryId !== catId);
+            if (state.selectedCategoryId === catId) {
+              state.selectedCategoryId = 'all'; state.selectedSubcategoryId = 'all';
+            }
+            if (adminSubParentCatId === catId) {
+              adminSubParentCatId = state.categories[0] ? state.categories[0].id : '';
+            }
+            saveState(); render(); renderAdminModal();
+          });
+        });
+
+        const subParentSel = document.getElementById('subParentCatSelect');
+        if (subParentSel) {
+          subParentSel.addEventListener('change', (e) => {
+            adminSubParentCatId = e.target.value; editingSubcategoryId = null; renderAdminModal();
+          });
+        }
+
+        const cancelEditSubBtn = document.getElementById('cancelEditSubBtn');
+        if (cancelEditSubBtn) {
+          cancelEditSubBtn.addEventListener('click', () => { editingSubcategoryId = null; renderAdminModal(); });
+        }
+
+        body.querySelectorAll('[data-edit-sub]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const target = state.subcategories.find((s) => s.id === btn.dataset.editSub);
+            if (!target) return;
+            editingSubcategoryId = target.id; adminSubParentCatId = target.categoryId; renderAdminModal();
+          });
+        });
+
+        document.getElementById('addSubBtn').addEventListener('click', () => {
+          const parentId = document.getElementById('subParentCatSelect').value;
+          const name = (document.getElementById('newSubNameInput').value || '').trim();
+          if (!parentId || !name) return;
+
+          if (editingSubcategoryId) {
+            const target = state.subcategories.find((s) => s.id === editingSubcategoryId);
+            if (target) { target.categoryId = parentId; target.name = name; }
+            editingSubcategoryId = null;
+          } else {
+            state.subcategories.push({ id: 'sub-' + Date.now(), categoryId: parentId, name });
+          }
+
+          adminSubParentCatId = parentId;
+          saveState(); render(); renderAdminModal(); showToast(t.savedToast);
+        });
+
+        body.querySelectorAll('[data-del-sub]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const subId = btn.dataset.delSub;
+            if (editingSubcategoryId === subId) editingSubcategoryId = null;
+            state.subcategories = state.subcategories.filter((s) => s.id !== subId);
+            state.products.forEach((p) => { if (p.subcategoryId === subId) p.subcategoryId = ''; });
+            if (state.selectedSubcategoryId === subId) { state.selectedSubcategoryId = 'all'; }
+            saveState(); render(); renderAdminModal();
+          });
+        });
+      } else if (adminTab === 'news') {
+        const editingNews = editingNewsId ? state.news.find((n) => n.id === editingNewsId) : null;
+        const initNewsTitle = editingNews ? editingNews.title : '';
+        const initNewsText = editingNews ? editingNews.text : '';
+
+        body.innerHTML = `
+          <div class="p-3 rounded-xl bg-[#FAF6F0] border border-[#E5D8C5] space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="font-bold text-[#2A1F18]">${editingNews ? t.editNewsTitle : t.addNewsTitle}</div>
+              ${editingNews ? `<button id="cancelEditNewsBtn" type="button" class="text-[11px] font-semibold text-[#6E5C4F]">${t.cancelEditBtn}</button>` : ''}
+            </div>
+            <input id="newNewsTitle" type="text" value="${String(initNewsTitle).replace(/"/g, '&quot;')}" placeholder="${t.newsTitlePlaceholder}" class="w-full bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2.5 py-2" />
+            <textarea id="newNewsText" rows="2" placeholder="${t.newsTextPlaceholder}" class="w-full bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2.5 py-2">${escapeHtml(initNewsText)}</textarea>
+            <button id="addNewsBtn" type="button" class="w-full py-2 rounded-lg bg-amber-700 text-white font-bold">${editingNews ? t.saveBtn : t.publishBtn}</button>
+          </div>
+          <div class="space-y-1.5 max-h-40 overflow-y-auto">
+            ${state.news
+              .map(
+                (n) => `<div class="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF6F0] border border-[#E5D8C5] gap-2">
+                  <span class="font-semibold truncate pr-2">${getLocalizedNewsField(n, 'title')}</span>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <button type="button" data-edit-news="${n.id}" class="text-blue-700 font-bold">${t.editBtn}</button>
+                    <button type="button" data-del-news="${n.id}" class="text-[#DC2626] font-bold">${t.deleteBtn}</button>
+                  </div>
+                </div>`
+              )
+              .join('')}
+          </div>
+        `;
+
+        const cancelEditNewsBtn = document.getElementById('cancelEditNewsBtn');
+        if (cancelEditNewsBtn) {
+          cancelEditNewsBtn.addEventListener('click', () => { editingNewsId = null; renderAdminModal(); });
+        }
+
+        body.querySelectorAll('[data-edit-news]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const target = state.news.find((n) => n.id === btn.dataset.editNews);
+            if (!target) return;
+            editingNewsId = target.id; renderAdminModal();
+          });
+        });
+
+        document.getElementById('addNewsBtn').addEventListener('click', () => {
+          const title = document.getElementById('newNewsTitle').value.trim();
+          const text = document.getElementById('newNewsText').value.trim();
+          if (!title || !text) return;
+
+          if (editingNewsId) {
+            const target = state.news.find((n) => n.id === editingNewsId);
+            if (target) { target.title = title; target.text = text; }
+            editingNewsId = null;
+          } else {
+            state.news.unshift({
+              id: 'news-' + Date.now(), type: 'new_material', badge: t.news,
+              title, text, colorName: '', colorHex: '#059669', date: new Date().toISOString().slice(0, 10)
+            });
+          }
+
+          saveState(); render(); renderAdminModal(); showToast(t.savedToast);
+        });
+
+        body.querySelectorAll('[data-del-news]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            if (editingNewsId === btn.dataset.delNews) editingNewsId = null;
+            state.news = state.news.filter((n) => n.id !== btn.dataset.delNews);
+            saveState(); render(); renderAdminModal();
+          });
+        });
+      } else if (adminTab === 'codes') {
+        body.innerHTML = `
+          <div class="p-3 rounded-xl bg-[#FAF6F0] border border-[#E5D8C5] space-y-3">
+            <div class="font-bold text-[#2A1F18]">${t.authSettingsTitle}</div>
+            <div>
+              <label class="block text-[11px] font-semibold text-[#6E5C4F] mb-1">${t.newMasterCodeLabel}</label>
+              <input id="tabMasterCode" type="text" value="${String(masterCode).replace(/"/g, '&quot;')}" placeholder="${t.step1CodePlaceholder}" class="w-full bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2.5 py-2" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-[#6E5C4F] mb-1">${t.newNumericPinLabel}</label>
+              <input id="tabNumericPin" type="text" inputmode="numeric" pattern="[0-9]*" value="${String(numericPin).replace(/"/g, '&quot;')}" placeholder="${t.newPinPlaceholder}" class="w-full bg-[#FFFDF9] border border-[#E5D8C5] rounded-lg px-2.5 py-2" />
+            </div>
+            <button id="saveCodesBtn" type="button" class="w-full py-2.5 rounded-lg bg-amber-700 text-white font-bold">${t.saveBtn}</button>
+          </div>
+        `;
+
+        document.getElementById('saveCodesBtn').addEventListener('click', () => {
+          const nextMaster = document.getElementById('tabMasterCode').value.trim();
+          const nextPinRaw = document.getElementById('tabNumericPin').value.trim();
+          const nextPin = nextPinRaw.replace(/\D+/g, '');
+
+          if (!state.auth) state.auth = {};
+          if (nextMaster) state.auth.masterCode = nextMaster;
+          if (nextPin) state.auth.numericPin = nextPin;
+
+          saveState(); renderAdminModal(); showToast(t.savedToast);
+        });
+      } else if (adminTab === 'company') {
+        const c = state.company;
+        body.innerHTML = `
+          <div class="space-y-2">
+            <input id="cmpName" type="text" value="${escapeHtml(c.name)}" placeholder="${getLocalizedCompanyField('name')}" class="w-full bg-[#FAF6F0] border border-[#E5D8C5] rounded-lg px-2.5 py-2" />
+            <input id="cmpPhone" type="text" value="${escapeHtml(c.phone)}" placeholder="${t.phoneLabel}" class="w-full bg-[#FAF6F0] border border-[#E5D8C5] rounded-lg px-2.5 py-2" />
+            <input id="cmpTg" type="text" value="${escapeHtml(c.telegram)}" placeholder="${t.telegramLabel}" class="w-full bg-[#FAF6F0] border border-[#E5D8C5] rounded-lg px-2.5 py-2" />
+            <input id="cmpAddr" type="text" value="${escapeHtml(c.address)}" placeholder="${t.addressLabel}" class="w-full bg-[#FAF6F0] border border-[#E5D8C5] rounded-lg px-2.5 py-2" />
+            <textarea id="cmpDeliv" rows="2" placeholder="${t.deliveryLabel}" class="w-full bg-[#FAF6F0] border border-[#E5D8C5] rounded-lg px-2.5 py-2">${escapeHtml(c.deliveryInfo)}</textarea>
+
+            <button id="saveCmpBtn" type="button" class="w-full py-2 rounded-lg bg-amber-700 text-white font-bold">${t.saveBtn}</button>
+          </div>
+        `;
+        document.getElementById('saveCmpBtn').addEventListener('click', () => {
+          state.company.name = document.getElementById('cmpName').value.trim() || 'Adraschi Amaki';
+          state.company.phone = document.getElementById('cmpPhone').value.trim();
+          state.company.telegram = document.getElementById('cmpTg').value.trim();
+          state.company.address = document.getElementById('cmpAddr').value.trim();
+          state.company.deliveryInfo = document.getElementById('cmpDeliv').value.trim();
+
+          saveState(); render(); renderAdminModal(); showToast(t.savedToast);
+        });
+      }
+    }
+
+    // Global Listeners
+    document.getElementById('langSelect').value = state.lang;
+    document.getElementById('langSelect').addEventListener('change', (e) => {
+      state.lang = e.target.value;
+      saveState();
+      render();
+      if (!document.getElementById('adminModal').classList.contains('hidden')) {
+        renderAdminModal();
+      }
+    });
+
+    document.querySelectorAll('.nav-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.activeTab = btn.dataset.tab;
+        render();
+      });
+    });
+
+    document.getElementById('openAdminBtn').addEventListener('click', openAdminModal);
+
+    document.getElementById('closeOnboardingBtn').addEventListener('click', () => {
+      localStorage.setItem(STORAGE_KEYS.onboarded, '1');
+      document.getElementById('onboardingModal').classList.add('hidden');
+    });
+
+    updateOnboardingTexts();
+    if (!localStorage.getItem(STORAGE_KEYS.onboarded)) {
+      document.getElementById('onboardingModal').classList.remove('hidden');
+    }
+
+    render();
+  </script>
+</body>
+</html>
